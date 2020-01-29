@@ -41,11 +41,20 @@ Table::Table(const string &name, const ColumnNames &columns)
       _columns(columns)
 {
     //IMPLEMENT_ME();
-    if (columns.empty())
-    {
-        throw TableException("wtf");
+    if (columns.empty()){
+        throw TableException("Empty column");
     }
-
+    ColumnNames tmp(columns);
+    set<string> s;
+    while (!tmp.empty())
+    {
+        s.insert(tmp.back());
+        tmp.pop_back();
+    }
+    if (s.size() != columns.size())
+    {
+        throw TableException("Duplicate columns");
+    }
 }
 
 Table::~Table()
