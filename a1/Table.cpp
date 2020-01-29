@@ -40,10 +40,15 @@ Table::Table(const string &name, const ColumnNames &columns)
     : _name(name),
       _columns(columns)
 {
-    IMPLEMENT_ME();
+    //IMPLEMENT_ME();
+    if (columns.empty())
+    {
+        throw TableException("wtf");
+    }
+
 }
 
 Table::~Table()
 {
-    IMPLEMENT_ME();
+    //IMPLEMENT_ME();
 }
