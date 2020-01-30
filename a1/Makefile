@@ -23,7 +23,7 @@ OBJECTS = \
 default: a1
 
 .cpp.o:
-	g++ -std=c++11 -Wall -Wno-unused-function -c $< -o $@
+	g++ -std=c++11 -Wall -Wno-unused-function -c -g $< -o $@
 
 a1: $(OBJECTS)
 	g++ -std=c++11 -Wall -Wno-unused-function $(OBJECTS) -o a1

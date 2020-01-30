@@ -1,7 +1,7 @@
 #include "DB.h"
 #include "util.h"
 #include "unittest.h"
-
+#include<iostream>
 using namespace std;
 
 // ------------------------------------------------------------------------------------------
@@ -34,6 +34,7 @@ static bool add(Table* table, const vector<string>& values)
         if (!added) {
             delete row;
         }
+	
         return added;
     } catch (TableException& e) {
         delete row;

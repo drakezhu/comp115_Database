@@ -6,7 +6,7 @@
 #include "RowCompare.h"
 #include "ColumnNames.h"
 #include "Database.h"
-
+#include<iostream>
 using namespace std;
 
 class RowSet: public set<Row*, RowCompare> {};
