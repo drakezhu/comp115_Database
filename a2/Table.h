@@ -6,13 +6,14 @@
 #include "RowCompare.h"
 #include "ColumnNames.h"
 #include "Database.h"
+
 using namespace std;
 
 class RowSet: public set<Row*, RowCompare> {};
 
 class Table
 {
-    friend Table* Database::new_table(const string &name, const ColumnNames &columns);
+    friend Table* Database::new_table(const string& name, const ColumnNames& columns);
 
 public:
     // The name of this Table

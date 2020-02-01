@@ -8,7 +8,7 @@ using namespace std;
 
 class Table;
 
-class Row  : public vector<string>
+class Row
 {
 public:
     // This Row's table
@@ -24,7 +24,7 @@ public:
     void append(const string& value);
 
     // The number of values in this Row.
-    //unsigned long size() const;
+    unsigned long size() const;
 
     // Create a Row for the given Table
     Row(const Table *table);
@@ -34,6 +34,5 @@ public:
 
 private:
     const Table *_table;
-    
-    // Add a data member to store the contents of the row
+    vector<string> _values;
 };
