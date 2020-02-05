@@ -7,13 +7,31 @@
 
 Table *onion(Table *r, Table *s)
 {
-    IMPLEMENT_ME();
-    return NULL;
+    //IMPLEMENT_ME();
+    if (r->columns().size() != s->columns().size())
+    {
+        throw UnionIncompatibilityException("number of columns are not equal!");
+    }
+    RowSet _rows(r->rows());
+    _rows.insert(s->rows().begin(), s->rows().end());
+    Table* uTable = Database::new_table("Union", r->columns());
+    auto it = _rows.begin();
+    while (it != _rows.end())
+    {
+        uTable->add(*it);
+        it = _rows.erase(it);
+    }
+    return uTable;
 }
 
 Table *intersect(Table *r, Table *s)
 {
-    IMPLEMENT_ME();
+    //IMPLEMENT_ME();
+    if (r->columns().size() != s->columns().size())
+    {
+        throw UnionIncompatibilityException("number of columns are not equal!");
+    }
+    
     return NULL;
 }
 
