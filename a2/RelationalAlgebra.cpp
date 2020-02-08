@@ -36,14 +36,25 @@ Table *onion(Table *r, Table *s)
 }   
 
 Table *intersect(Table *r, Table *s)
-{
+{   
     //IMPLEMENT_ME();
     if (r->columns().size() != s->columns().size())
-    {
+    {   
         throw UnionIncompatibilityException("number of columns are not equal!");
     }
+    Table* iTable = Database::new_table(Database::new_table_name(), r->columns());
+
     
-    return NULL;
+    for (set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
+    {   
+        if (s->has(*it))
+        {   
+            Row* tmp = new Row(iTable,*it);
+            iTable->add(tmp);
+        }
+    
+    }
+    return iTable;
 }
 
 Table *diff(Table *r, Table *s)
