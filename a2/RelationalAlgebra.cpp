@@ -7,22 +7,33 @@
 
 Table *onion(Table *r, Table *s)
 {
-    //IMPLEMENT_ME();
-    if (r->columns().size() != s->columns().size())
+    Table *onion(Table *r, Table *s)
     {
-        throw UnionIncompatibilityException("number of columns are not equal!");
+        //IMPLEMENT_ME();
+        if (r->columns().size() != s->columns().size())
+        {
+            throw UnionIncompatibilityException("number of columns are not equal!");
+        }
+        Table* uTable = Database::new_table(Database::new_table_name(), r->columns());
+        for(set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
+        {
+            Row* tmp = new Row(uTable,*it);
+            uTable->add(tmp);
+        }
+        for(set<Row*,RowCompare>::iterator it=s->rows().begin();it!=s->rows().end();it++)
+        {
+            Row* tmp = new Row(uTable,*it);
+            unsigned len = uTable->rows().size();
+            uTable->add(tmp);
+            if (len == uTable->rows().size())
+            {
+                delete tmp;
+            }
+
+        }
+        return uTable;
     }
-    RowSet _rows(r->rows());
-    _rows.insert(s->rows().begin(), s->rows().end());
-    Table* uTable = Database::new_table("Union", r->columns());
-    auto it = _rows.begin();
-    while (it != _rows.end())
-    {
-        uTable->add(*it);
-        it = _rows.erase(it);
-    }
-    return uTable;
-}
+}   
 
 Table *intersect(Table *r, Table *s)
 {
