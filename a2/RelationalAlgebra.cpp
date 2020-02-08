@@ -81,8 +81,39 @@ Table *diff(Table *r, Table *s)
 
 Table *product(Table *r, Table *s)
 {
-    IMPLEMENT_ME();
-    return NULL;
+    //IMPLEMENT_ME();
+    auto n = r->columns().size();
+    auto m = s->columns().size();
+    ColumnNames col(s->columns());
+    for (unsigned long i = 0; i < n; i++)
+    {   
+        for (unsigned long j = 0; j < m; j++)
+        {   
+            
+            if (r->columns().at(i) == s->columns().at(j))
+            {   
+                throw TableException("Duplicate columns");
+            }
+        }
+        col.emplace_back(r->columns().at(i));
+    }
+    Table* pTable = Database::new_table(Database::new_table_name(), col);
+
+    for (set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
+    {   
+        for (set<Row*,RowCompare>::iterator it2=s->rows().begin();it2!=s->rows().end();it2++)
+        {   
+            Row* tmp = new Row(pTable,*it);
+            
+            for (unsigned long i = 0; i < m; i++)
+            {   
+                tmp->append((*it2)->at(i));
+            }
+            pTable->add(tmp);
+        }
+    }
+    
+    return pTable;
 }
 
 Table *rename(Table *r, const NameMap &name_map)
