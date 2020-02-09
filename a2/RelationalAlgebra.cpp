@@ -118,8 +118,25 @@ Table *product(Table *r, Table *s)
 
 Table *rename(Table *r, const NameMap &name_map)
 {
-    IMPLEMENT_ME();
-    return NULL;
+    //IMPLEMENT_ME();
+    if (name_map.size() == 0 or name_map.size() != r->columns().size())
+    {
+        throw TableException("size problem!");
+    }
+    ColumnNames* col = new ColumnNames();
+    for(unsigned long i = 0; i < r->columns().size();i++)
+    {
+        auto it = name_map.find(r->columns().at(i));
+        if (it == name_map.end())
+        {
+            delete col;
+            throw TableException("column not found");
+        }
+        col->push_back(it->second);
+    }
+    r->reNameCol(col);
+    delete col;
+    return r;
 }
 
 Table *select(Table *r, RowPredicate predicate)

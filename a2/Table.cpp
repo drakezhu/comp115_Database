@@ -46,7 +46,14 @@ bool Table::remove(Row* row)
     }
     return removed;
 }
-
+void Table::reNameCol(ColumnNames* columns)
+{
+    _columns.clear();
+    for (unsigned i = 0; i < columns->size(); i++)
+    {
+        _columns.push_back(columns->at(i));
+    }
+}
 bool Table::has(Row* row)
 {
     if (row->size() != _columns.size()) {
@@ -82,3 +89,4 @@ Table::~Table()
     }
     _rows.clear();
 }
+
