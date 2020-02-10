@@ -141,7 +141,7 @@ Table *rename(Table *r, const NameMap &name_map)
 
 Table *select(Table *r, RowPredicate predicate)
 {
-    IMPLEMENT_ME();
+    //IMPLEMENT_ME();
     Table* sTable = Database::new_table(Database::new_table_name(), r->columns());
     for (set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
     {
@@ -157,10 +157,65 @@ Table *select(Table *r, RowPredicate predicate)
 
 Table *project(Table *r, const ColumnNames &columns)
 {
-    IMPLEMENT_ME();
-    return NULL;
-}
+    //IMPLEMENT_ME();
+    Table* pTable = Database::new_table(Database::new_table_name(), r->columns());
+    if (columns.size() == 0)
+    {
+        throw TableException("Empty Columns!");
+    }
+    ColumnNames* col = new ColumnNames();
+    vector<unsigned int> selectedCols;
+    for (auto it = columns.begin(); it != columns.end();it++ )
+    {
+	    unsigned int counter = 0;
+	    bool Added = false;
+        for (auto it2 = r->columns().begin(); it2 != r->columns().end(); it2++, counter++)
+        {
+            bool areSame = true;
 
+            if (((*it2).size()) != ((*it).size()))
+            {
+                continue;
+            }
+            for (unsigned i = 0; i < (*it).size(); i++)
+            {
+                if ((*it).at(i) != (*it2).at(i))
+                {
+                    areSame = false;
+                    break;
+                }
+            }
+ 	        if (areSame)
+            {
+                col->push_back(*it);
+                selectedCols.push_back(counter);
+		        Added = true;
+            }
+	    }
+        if (!Added)
+        {
+	        delete col;
+            throw TableException("Column Unknown!");
+        }
+    }
+    pTable->reNameCol(col);
+    for (set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
+    {
+        Row* tmp = new Row(pTable);
+        for (auto it2 = selectedCols.begin(); it2 != selectedCols.end();it2++)
+        {
+            tmp->append((*it)->at(*it2));
+        }
+        unsigned size = pTable->rows().size();
+        pTable->add(tmp);
+        if (size == pTable->rows().size())
+        {
+            delete tmp;
+        }
+    }
+    delete col; 
+    return pTable;
+}
 Table *join(Table *r, Table *s)
 {
     IMPLEMENT_ME();
