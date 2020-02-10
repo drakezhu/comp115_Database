@@ -142,7 +142,17 @@ Table *rename(Table *r, const NameMap &name_map)
 Table *select(Table *r, RowPredicate predicate)
 {
     IMPLEMENT_ME();
-    return NULL;
+    Table* sTable = Database::new_table(Database::new_table_name(), r->columns());
+    for (set<Row*,RowCompare>::iterator it=r->rows().begin();it!=r->rows().end();it++)
+    {
+        if (predicate(*it))
+        {
+            Row* tmp = new Row(sTable,*it);
+            sTable->add(tmp);
+        }   
+    }
+    
+    return sTable;
 }
 
 Table *project(Table *r, const ColumnNames &columns)
