@@ -1,0 +1,29 @@
+3.1 X->Y; X->Z; Y->X; Y->Z; Z->X; Z->Y
+    X,Y->Z; X,Z->Y; Y,Z->X
+
+    PS: (X->Y,Z; Y->X,Z; Z->X,Y can be ignored since X->Y,Z is the combinition of X->Y and X->Z)
+
+3.2 
+	X Y Z
+	1 5 7
+	1 6 8
+	From this we can eliminate FDs on: X -> Y; X -> Z;
+
+	X Y Z
+	1 6 8
+	2 6 8
+	From this we can eliminate FDs on: Y,Z -> X; Y -> X; Z -> X
+
+	X Y Z
+	7 1 20
+	7 2 20
+	From this we can eliminate FDs on: Z -> Y; X,Z -> Y
+
+	So the only left possible FDs are Y -> Z and X,Y -> Z
+
+3.3 
+	We can only eliminate FDs on X -> Y and X -> Z
+
+3.4
+	We cannot rule out any FDs
+
