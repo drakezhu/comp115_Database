@@ -1,0 +1,13 @@
+Primary key:
+1. Department -> Department_Name: Because the name of the department in a college is unique and not null
+2. Professor -> Professor_id: Likewise, the professor id is also unique and not null
+3. Work -> Department_Name: Generate by the demartment which guarantees that it is unique, and this table is used for illustrating an one to many relationship.
+4. Course -> CatlogNumber: The CatlogNumber is unique and not null.
+5. Offering -> (CatlogNumber,Semester): The tuple of these two can guarantee the unique attribute in this table.
+6. OfferProfessor -> (CatlogNumber,Semester,Professor_id) This table is created for a many to many relationship, the primary key is the tuple which are unique attribute.
+7. Task -> Task_id: The task_id is self-generated, which guarantee it is unique and not null
+8. Grade -> (Task_id, Student_id): Grade table is created for showing the many to many relationship between task and student table. The primary tuple is unique for sure.
+9. Student -> Student_id: This id is also self-generated, which can guarantee it is unique.
+10. TA -> TA_id: Similar to Student_id, this is also self-generated, which is unique and not null.
+11 TA_Offering (TA_id,CatlogNumber,Semester): Like OfferingProfessor, is a table help solve many to many relationship, the tuple key is unique from other two tables.
+12 TakeCourse (CatlogNumber,Semester,Student_id): Also used for illustrating many to many relationship, the primary key tuple are from other tables.
