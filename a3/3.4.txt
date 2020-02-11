@@ -1,0 +1,15 @@
+4.1
+	The Candidate Key is V
+	X -> Y,Z violates BCNF
+	The clousure of this dependency is (X,Y,Z)
+	The improved BCNF schema is: {X,Y,Z}, {V,W,X}
+4.2
+	The Candidate Key is (W,X)
+
+	X -> Z violates BCNF
+	The clousure of this dependency is (X,Z)
+	The improved schema is {W,X,Y}, {X,Z}
+
+	Y -> W also violates BCNF
+	The clousure of this dependency is (Y,W)
+	The improved schema after the first step would be: {W,Y},{W,X},{X,Y}
