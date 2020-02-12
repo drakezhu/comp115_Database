@@ -1,5 +1,4 @@
 #include "Table.h"
-
 using namespace std;
 
 const string &Table::name() const
@@ -46,14 +45,7 @@ bool Table::remove(Row* row)
     }
     return removed;
 }
-void Table::reNameCol(ColumnNames* columns)
-{
-    _columns.clear();
-    for (unsigned i = 0; i < columns->size(); i++)
-    {
-        _columns.push_back(columns->at(i));
-    }
-}
+
 bool Table::has(Row* row)
 {
     if (row->size() != _columns.size()) {
@@ -61,6 +53,16 @@ bool Table::has(Row* row)
     }
     auto i = _rows.find(row);
     return i != _rows.end();
+}
+
+
+void Table::reNameCol(ColumnNames* columns)
+{
+    _columns.clear();
+    for (unsigned i = 0; i < columns->size(); i++)
+    {
+        _columns.push_back(columns->at(i));
+    }
 }
 
 Table::Table(const string &name, const ColumnNames &columns)
@@ -89,4 +91,3 @@ Table::~Table()
     }
     _rows.clear();
 }
-

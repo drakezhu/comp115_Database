@@ -1,7 +1,7 @@
 #include "DB.h"
 #include "util.h"
 #include "unittest.h"
-
+#include<iostream>
 using namespace std;
 
 // ------------------------------------------------------------------------------------------
@@ -166,7 +166,6 @@ static void union_compatible_both_non_empty()
     add(control, {"3", "77"});
     assert(table_eq(control, onion(r, s)));
 }
-
 // Intersect
 
 static void intersect_incompatible()

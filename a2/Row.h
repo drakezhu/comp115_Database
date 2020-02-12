@@ -28,10 +28,10 @@ public:
 
     // Create a Row for the given Table
     Row(const Table *table);
-    
+   
     // Create a copy constructor for the given Table and given Row 
     Row(const Table *table, const Row *row);
-    
+
     // Destroy this Row
     ~Row();
 

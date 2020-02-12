@@ -1,6 +1,6 @@
 #include "Database.h"
 #include "Table.h"
-
+#include<iostream>
 const Table *Row::table() const
 {
     return _table;
@@ -40,7 +40,7 @@ Row::Row(const Table *table)
 Row::Row(const Table *table, const Row *r)
         : _table(table)
 {
-
+    
     for(unsigned int i = 0; i < r->size(); i++)
     {
         _values.emplace_back(r->at(i));

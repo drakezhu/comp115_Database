@@ -31,11 +31,12 @@ public:
     // eventually.
     bool add(Row* row);
 
+    // Rename columns
+    void reNameCol(ColumnNames* columns);
+
     // Remove and delete a row matching the given row from this table. Return true if the row was found,
     // false if it wasn't.
     bool remove(Row* row);
-    
-    void reNameCol(ColumnNames* columns);
 
     // Return true if a row matching the given row is present in the table, false otherwise.
     bool has(Row* row);
