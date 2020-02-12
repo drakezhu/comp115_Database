@@ -277,7 +277,8 @@ static bool q3_predicate(Row* row)
 
 static void test_q3()
 {
-    Table* q3 = IMPLEMENT_ME();
+    Table* q3 = project(select(join(join(rename(routing,NameMap({{"from_user_id", "from_user_id"},{"to_user_id","user_id"},{"message_id","message_id"}})),user),message),q3_predicate),ColumnNames{"username"});
+    Table* q3 = project(select( , q3_predicate), ColumnNames{"username"})
     Table* control3 = Database::new_table("control3", ColumnNames{"username"});
     add(control3, {"Moneyocracy"});
     assert(table_eq(control3, q3));
