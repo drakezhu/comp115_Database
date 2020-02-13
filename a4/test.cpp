@@ -248,6 +248,7 @@ static bool q2_predicate(Row* row)
 
 static void test_q2()
 {
+    setup();
     Table* q2 = project(join(project(join(project(select(user, q2_predicate),ColumnNames{"user_id"}),rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id","to_user_id"},{"message_id","message_id"}}))),ColumnNames{"message_id"}),message),ColumnNames{"send_date"});
     add(control2, {"2015/01/09"});
     add(control2, {"2015/04/29"});
@@ -277,6 +278,7 @@ static bool q3_predicate(Row* row)
 
 static void test_q3()
 {
+    setup();
     Table* q3 = project(select(join(join(rename(routing,NameMap({{"from_user_id", "from_user_id"},{"to_user_id","user_id"},{"message_id","message_id"}})),user),message),q3_predicate),ColumnNames{"username"});
     Table* q3 = project(select( , q3_predicate), ColumnNames{"username"})
     Table* control3 = Database::new_table("control3", ColumnNames{"username"});
@@ -300,7 +302,10 @@ static bool q4_to_predicate(Row* row)
 
 static void test_q4()
 {
-    Table* q4 = IMPLEMENT_ME();
+    setup();
+    Table* from = project(join(project(select(user, q4_from_predicate),ColumnNames{"user_id"}), rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id","to_user_id"},{"message_id","message_id"}}))), ColumnNames{"message_id"});
+    Table* to = project(join(project(select(user, q4_to_predicate), ColumnNames{"user_id"}), rename(routing,NameMap({{"user_id", "from_user_id"},{"to_user_id","user_id"},{"message_id","message_id"}}))), ColumnNames{"message_id"});
+    Table* q4 = project(join(join(from, to), message),ColumnNames{"send_date"});
     Table* control4 = Database::new_table("control4", ColumnNames{"send_date"});
     add(control4, {"2016/12/14"});
     assert(table_eq(control4, q4));
