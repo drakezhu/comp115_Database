@@ -1,7 +1,6 @@
 #include <fstream>
 #include "DB.h"
 #include "unittest.h"
-
 using namespace std;
 
 static char *db_dir;
@@ -210,7 +209,9 @@ static void test_q0()
                 join(
                     rename(
                         select(routing, q0_predicate),
-                        m),
+                        NameMap({{"from_user_id", "user_id"},
+                                 {"to_user_id",   "to_user_id"},
+                                 {"message_id",   "message_id"}})),
                     user),
                 ColumnNames{"username"}));
     // print_table("q0", q0);
@@ -230,7 +231,8 @@ static bool q1_predicate(Row* row)
 }
 
 static void test_q1()
-{    
+{
+    setup();
     Table* q1 = project(select(user,q1_predicate),ColumnNames{"birth_date"});
     Table* control1 = Database::new_table("control1", ColumnNames{"birth_date"});
     add(control1, {"1984/02/28"});
@@ -250,6 +252,7 @@ static void test_q2()
 {
     setup();
     Table* q2 = project(join(project(join(project(select(user, q2_predicate),ColumnNames{"user_id"}),rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id","to_user_id"},{"message_id","message_id"}}))),ColumnNames{"message_id"}),message),ColumnNames{"send_date"});
+    Table* control2 = Database::new_table("control2", ColumnNames{"send_date"});
     add(control2, {"2015/01/09"});
     add(control2, {"2015/04/29"});
     add(control2, {"2015/12/25"});
@@ -280,7 +283,6 @@ static void test_q3()
 {
     setup();
     Table* q3 = project(select(join(join(rename(routing,NameMap({{"from_user_id", "from_user_id"},{"to_user_id","user_id"},{"message_id","message_id"}})),user),message),q3_predicate),ColumnNames{"username"});
-    Table* q3 = project(select( , q3_predicate), ColumnNames{"username"})
     Table* control3 = Database::new_table("control3", ColumnNames{"username"});
     add(control3, {"Moneyocracy"});
     assert(table_eq(control3, q3));
@@ -305,7 +307,7 @@ static void test_q4()
     setup();
     Table* from = project(join(project(select(user, q4_from_predicate),ColumnNames{"user_id"}), rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id","to_user_id"},{"message_id","message_id"}}))), ColumnNames{"message_id"});
     Table* to = project(join(project(select(user, q4_to_predicate), ColumnNames{"user_id"}), rename(routing,NameMap({{"user_id", "from_user_id"},{"to_user_id","user_id"},{"message_id","message_id"}}))), ColumnNames{"message_id"});
-    Table* q4 = project(join(join(from, to), message),ColumnNames{"send_date"});
+    Table* q4 = project(join(join(from, to), message),ColumnNames{"send_date"});    
     Table* control4 = Database::new_table("control4", ColumnNames{"send_date"});
     add(control4, {"2016/12/14"});
     assert(table_eq(control4, q4));
@@ -322,6 +324,7 @@ static bool q5_predicate(Row* row)
 
 static void test_q5()
 {
+    setup();
     Table* q5 = project(join(project(join(project(select(message, q5_predicate),ColumnNames{"message_id"}),rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id", "to_user_id"},{"message_id", "message_id"}}))),ColumnNames{"user_id"}),user),ColumnNames{"username"});
     Table* control5 = Database::new_table("control5", ColumnNames{"username"});
     add(control5, {"Moneyocracy"});
@@ -339,7 +342,9 @@ static bool q6_predicate(Row* row)
 
 static void test_q6()
 {
-    Table* q6 = IMPLEMENT_ME();
+    setup();
+    Table* tmp = project(join(project(select(user, q6_predicate), ColumnNames{"user_id"}),rename(routing, NameMap{{"from_user_id","user_id"},{"to_user_id", "to_user_id"},{"message_id","message_id"}})),ColumnNames{"to_user_id"});
+    Table* q6 = project(join(rename(tmp, NameMap{{"to_user_id","user_id"}}),user),ColumnNames{"username"});
     Table* control6 = Database::new_table("control6", ColumnNames{"username"});
     add(control6, {"Abderian"});
     add(control6, {"Anchusa"});
@@ -372,7 +377,10 @@ static bool q7_predicate(Row* row)
 
 static void test_q7()
 {
-    Table* q7 = IMPLEMENT_ME();
+    setup();
+    Table* tmp = join(project(select(message, q7_predicate), ColumnNames{"message_id"}), routing);
+    Table* from = join(user,rename(tmp,NameMap({{"from_user_id","user_id"},{"to_user_id","to_user_id"},{"message_id","message_id"}})));
+    Table* q7 = rename(project(join(rename(project(from, ColumnNames{"username","to_user_id"}), NameMap({{"username","from_username"},{"to_user_id", "user_id"}})),user),ColumnNames{"from_username","username"}),NameMap{{"from_username","from_username"},{"username","to_username"}});
     Table* control7 = Database::new_table("control7", ColumnNames{"from_username", "to_username"});
     add(control7, {"Abderian", "Anchusa"});
     add(control7, {"Anchusa", "Anchusa"});
