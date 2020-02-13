@@ -322,7 +322,7 @@ static bool q5_predicate(Row* row)
 
 static void test_q5()
 {
-    Table* q5 = IMPLEMENT_ME();
+    Table* q5 = project(join(project(join(project(select(message, q5_predicate),ColumnNames{"message_id"}),rename(routing,NameMap({{"from_user_id", "user_id"},{"to_user_id", "to_user_id"},{"message_id", "message_id"}}))),ColumnNames{"user_id"}),user),ColumnNames{"username"});
     Table* control5 = Database::new_table("control5", ColumnNames{"username"});
     add(control5, {"Moneyocracy"});
     assert(table_eq(control5, q5));
