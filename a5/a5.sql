@@ -16,20 +16,20 @@ select birth_date from member where name = 'Tweetii';
 
 
 # q2
-select distinct message_date from message, (select * from member,routing where name = 'Zyrianyhippy' and member_id = from_member_id) subquery where message.message_id = subquery.message_id order by message.message_date;
+select distinct message_date from message, (select * from member,routing where name = 'Zyrianyhippy' and member_id = from_member_id) subquery where message.message_id = subquery.message_id order by message.message_date desc;
 # message_date 
 #--------------
-# 2015-01-05
-# 2015-04-16
-# 2015-04-30
-# 2015-06-25
-# 2015-11-04
-# 2015-11-15
-# 2016-02-14
-# 2016-08-05
-# 2017-02-22
-# 2017-02-23
 # 2017-11-13
+# 2017-02-23
+# 2017-02-22
+# 2016-08-05
+# 2016-02-14
+# 2015-11-15
+# 2015-11-04
+# 2015-06-25
+# 2015-04-30
+# 2015-04-16
+# 2015-01-05
 #(11 rows)
 
 # q3
@@ -105,20 +105,36 @@ select distinct sender, name as receiver from member, (select distinct member.na
 #(18 rows)
 
 # q8
-select count(*) from (select to_member_id from routing,member where from_member_id != to_member_id and name = 'Lucarne' and member_id = from_member_id) as a;
+select name, count(a.to_member_id) as messages from member left outer join (select to_member_id, message_id from member,routing where member_id = from_member_id and from_member_id != to_member_id and name = 'Lucarne') as a on member_id = a.to_member_id where name != 'Lucarne' group by a.to_member_id, name order by messages desc;
 
-# count 
-#-------
-#	39
-#(1 row)
+#     name     | messages 
+#--------------+----------
+# Flyaway      |        6
+# Tweetii      |        5
+# Cephalophore |        4
+# Oscitate     |        4
+# Botuliform   |        3
+# Unguiferous  |        2
+# Abderian     |        2
+# Anchusa      |        2
+# Bamboozled   |        2
+# Hindforemost |        2
+# Intaglio     |        1
+# Moneyocracy  |        1
+# Salpiglossis |        1
+# Froglet      |        1
+# Zyrianyhippy |        1
+# Squeezewas   |        1
+# Cynosure     |        1
+# Normalcy     |        0
+# Ijreilly     |        0
+#(19 rows)
 
-# q9
+select member.name, count(a.from_member_id) as messages from (select from_member_id from routing group by from_member_id,message_id order by from_member_id)as a, member where a.from_member_id = member.member_id  group by member.name, a.from_member_id having count(a.from_member_id) >= 20 order by messages;
 
-select a.from_member_id from (select from_member_id from routing group by from_member_id,message_id order by from_member_id) as a group by a.from_member_id having count(a.from_member_id) >= 20;
-
-# from_member_id 
-#----------------
-#             18
+#	name     | messages 
+#-------------+----------
+# Unguiferous |       21
 #(1 row)
 
 # q10
