@@ -13,45 +13,37 @@
 
 // TableIterator 
 
-unsigned TableIterator::n_columns() 
+unsigned TableIterator::n_columns()
 {
-    return IMPLEMENT_ME;
+  return _table->columns().size();
 }
 
-void TableIterator::open() 
+void TableIterator::open()
 {
-    file = fopen(table->file(), "r");
-    this->buffer = new char[BUFFER_SIZE];
-    this->buffer_start = 0;
-    this->buffer_end = 0;
+  _input = _table->rows().begin();
+  _end = _table->rows().end();
+
 }
 
-Row* TableIterator::next() 
+Row* TableIterator::next()
 {
-    int more = ensure_buffer_filled(file,
-                                    buffer, 
-                                    &buffer_start,
-                                    &buffer_end);
-    return
-        more
-        ? new Row(buffer, 
-                  &buffer_start,
-                  &buffer_end)
-        : NULL;
-    }
+  Row * tmp = NULL;
+  if (_input != _end)
+  {   
+    tmp = *_input;
+    _input++;
+  }
+  return tmp;
 }
 
-void TableIterator::close() 
-{
-    fclose(file);
-    delete [] buffer;
+void TableIterator::close()
+{   
 }
-
 TableIterator::TableIterator(Table* table)
-    : _table(table)
-{
-    this->table = table;
-    this->file = NULL;
+  : _table(table)
+{   
+  _input = table->rows().begin();
+  _end = table->rows().end();
 }
 
 //----------------------------------------------------------------------
