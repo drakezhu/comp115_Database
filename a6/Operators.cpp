@@ -20,22 +20,38 @@ unsigned TableIterator::n_columns()
 
 void TableIterator::open() 
 {
-    IMPLEMENT_ME;
+    file = fopen(table->file(), "r");
+    this->buffer = new char[BUFFER_SIZE];
+    this->buffer_start = 0;
+    this->buffer_end = 0;
 }
 
 Row* TableIterator::next() 
 {
-    return IMPLEMENT_ME;
+    int more = ensure_buffer_filled(file,
+                                    buffer, 
+                                    &buffer_start,
+                                    &buffer_end);
+    return
+        more
+        ? new Row(buffer, 
+                  &buffer_start,
+                  &buffer_end)
+        : NULL;
+    }
 }
 
 void TableIterator::close() 
 {
-    IMPLEMENT_ME;
+    fclose(file);
+    delete [] buffer;
 }
 
 TableIterator::TableIterator(Table* table)
     : _table(table)
 {
+    this->table = table;
+    this->file = NULL;
 }
 
 //----------------------------------------------------------------------
