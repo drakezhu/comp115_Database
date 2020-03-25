@@ -51,30 +51,54 @@ TableIterator::TableIterator(Table* table)
 // IndexScan
 
 unsigned IndexScan::n_columns()
-{
-    return IMPLEMENT_ME;
+{   
+  return _index->n_columns();
 }
 
 void IndexScan::open()
-{
-    IMPLEMENT_ME;
+{   
+  _input = _index->begin();
+  _end = _index->end();
 }
 
 Row* IndexScan::next()
-{
-    return IMPLEMENT_ME;
+{   
+  Row * tmp = NULL;
+  if (_input != _end)
+  {   
+    tmp = _input->second;
+    _input++;
+  }
+  return tmp;
 }
 
 void IndexScan::close()
-{
-    IMPLEMENT_ME;
+{   
 }
 
 IndexScan::IndexScan(Index* index, Row* lo, Row* hi)
     : _index(index),
       _lo(lo),
       _hi(hi == NULL ? lo : hi)
-{}
+{
+    for (auto it = _index->begin(); it != _index->end(); it++)
+    {
+        auto v = it->first;
+        bool shouldRemove = false;
+        for (unsigned i = 0; i < v.size(); i++)
+        {
+            if (v.at(i) < _lo->at(i) || v.at(i) > _hi->at(i))
+            {
+                shouldRemove = true;
+                break;
+            }
+        }
+        if (shouldRemove == true)
+        {
+            _index->erase(it);
+        }
+    }
+}
 
 //----------------------------------------------------------------------
 
