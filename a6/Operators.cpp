@@ -105,24 +105,39 @@ IndexScan::IndexScan(Index* index, Row* lo, Row* hi)
 // Select
 
 unsigned Select::n_columns()
-{
-    return IMPLEMENT_ME;
+{   
+    return _input->n_columns();
 }
 
 void Select::open()
-{
-    IMPLEMENT_ME;
+{   
+    _input->open();
 }
 
 Row* Select::next()
-{
-    return IMPLEMENT_ME;
+{   
+    Row* selected = NULL;
+    Row* row = _input->next();
+    if (row)
+    {   
+      if (_predicate(row))
+      {   
+        selected = new Row();
+        for (unsigned i = 0; i < row->size();i++)
+        {   
+          selected->append(row->at(i));
+        }
+        Row::reclaim(row);
+      }
+    }
+    return selected;
 }
 
 void Select::close()
 {
-    IMPLEMENT_ME;
+    _input->close();
 }
+
 
 Select::Select(Iterator* input, RowPredicate predicate)
     : _input(input),
