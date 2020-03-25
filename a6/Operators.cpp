@@ -198,23 +198,93 @@ Project::~Project()
 // NestedLoopsJoin
 
 unsigned NestedLoopsJoin::n_columns()
-{
-    return IMPLEMENT_ME;
+{   
+  return _left_join_columns.n_columns() + _right_join_columns.n_columns() - _right_join_columns.n_selected();
 }
 
 void NestedLoopsJoin::open()
 {
-    IMPLEMENT_ME;
+  _left->open();
+  _right->open();
+  _left_row = _left->next();
+}
+
+Row* NestedLoopsJoin::join_rows_if_match(const Row* left, const Row* right)
+{
+  Row* tmp = new Row();
+  for (unsigned i = 0; i < _left_join_columns.n_columns(); i++)
+  {
+    tmp->append(left->at(i));
+  }
+  for (unsigned i = 0; i < _right_join_columns.n_unselected(); i++)
+  {
+    tmp->append(right->at(_right_join_columns.unselected(i)));
+  }
+  return tmp;
 }
 
 Row* NestedLoopsJoin::next()
 {
-    return IMPLEMENT_ME;
+  Row* _right_row = _right->next();
+  if (!_left_row || !_right_row)
+  {
+    return NULL;
+  }
+  while (_left_row)
+  {
+    if (!_right_row)
+    {
+      _left_row = _left->next();
+      if (!_left_row)
+      {
+        return NULL;
+      }
+      _right->close();
+      _right->open();
+      _right_row = _right->next();
+    }
+    bool flag = true;
+    for (unsigned i = 0; i < _right_join_columns.n_selected(); i++)
+    {
+      if (_left_row->at(_left_join_columns.selected(i)) != _right_row->at(_right_join_columns.selected(i)))
+      {
+        flag = false;
+        break;
+      }
+    }
+    if (flag == true)
+    {
+      return join_rows_if_match(_left_row, _right_row);
+    }
+    _right_row = _right->next();
+  }
+  return NULL;
 }
 
 void NestedLoopsJoin::close()
 {
-    IMPLEMENT_ME;
+    _left->close();
+    _right->close();
+}
+
+NestedLoopsJoin::NestedLoopsJoin(Iterator* left,
+                                 const initializer_list<unsigned>& left_join_columns,
+                                 Iterator* right,
+                                 const initializer_list<unsigned>& right_join_columns)
+    : _left(left),
+      _right(right),
+      _left_join_columns(left->n_columns(), left_join_columns),
+      _right_join_columns(right->n_columns(), right_join_columns),
+      _left_row(NULL)
+{
+    assert(_left_join_columns.n_selected() == _right_join_columns.n_selected());
+}
+
+NestedLoopsJoin::~NestedLoopsJoin()
+{
+    delete _left;
+    delete _right;
+    Row::reclaim(_left_row);
 }
 
 NestedLoopsJoin::NestedLoopsJoin(Iterator* left,
