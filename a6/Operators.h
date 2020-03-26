@@ -135,4 +135,5 @@ public:
 private:
     Iterator* _input;
     Row* _next_unique;
+    string _laststring;
 };

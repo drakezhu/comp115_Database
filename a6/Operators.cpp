@@ -393,15 +393,15 @@ Sort::~Sort()
 //----------------------------------------------------------------------
 
 // Unique
-
 unsigned Unique::n_columns()
-{
+{   
   return _input->n_columns();
 }
 
 void Unique::open()
-{
+{   
   _input->open();
+  _lastString = "";
 }
 
 Row* Unique::next()
@@ -410,38 +410,53 @@ Row* Unique::next()
   bool found = false;
   while (row)
   {
-    if (!_next_unique)
-    {
-      _next_unique = row;
-      found = true;
-      break;
+  if (_lastString == "")
+  {   
+    _next_unique = row;
+    for (unsigned i = 0; i < row->size(); i++)
+    {   
+      _lastString += row->at(i);
     }
-    else
-    {
-      bool equal = true;
-      for (unsigned i = 0; i < n_columns(); i++)
-      {
-        if (_next_unique->at(i) != row->at(i))
-        {
-          equal = false;
-          break;
-        }
-
+    found = true;
+    break;
+  }
+  else
+  {   
+    bool equal = true;
+    for (unsigned i = 0; i < n_columns(); i++)
+    {   
+      string tmp = "";
+      for (unsigned i = 0; i < row->size(); i++)
+      {   
+        tmp += row->at(i);
       }
-      if (equal == false)
-      {
-        _next_unique = row;
-        Row::reclaim(row);
-        found = true;
+      if (tmp.compare(_lastString) != 0)
+      {   
+        equal = false;
         break;
       }
+    
     }
-    row = _input->next();
-  }
-  if (found == false)
-  {
+    if (equal == false)
+    {   
+      _next_unique = row;
+      for (unsigned i = 0; i < row->size(); i++)
+      {  
+                    _lastString = "";
+                    _lastString += row->at(i);
+                }
+                //Row::reclaim(row);
+                found = true;
+                break;
+            }
+        }
+        row = _input->next();
+    }
+    if (found == false)
+    {
         _next_unique = NULL;
     }
+
     return _next_unique;
 
 }
@@ -449,13 +464,14 @@ Row* Unique::next()
 void Unique::close()
 {
     _input->close();
-    _next_unique = NULL;
 }
 
 Unique::Unique(Iterator* input)
     : _input(input),
-      _next_unique(NULL)
-{}
+      _next_unique(NULL),
+      _lastString("")
+{
+}
 
 Unique::~Unique()
 {

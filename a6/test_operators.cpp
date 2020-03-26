@@ -444,24 +444,69 @@ void unique_no_next()
     delete i;
 }
 
+
 void unique_non_empty()
 {
     Table* t = Database::new_table("t", ColumnNames{"a", "b"});
-    add(t, {"1", "10"});
-    add(t, {"2", "20"});
-    add(t, {"2", "20"});
-    add(t, {"1", "10"});
-    add(t, {"1", "10"});
-    add(t, {"1", "10"});
-    add(t, {"3", "30"});
+    add(t, {"2015/01/09"});
+    add(t, {"2015/01/09"});
+    add(t, {"2015/01/09"});
+    add(t, {"2015/01/09"});
+    add(t, {"2015/01/09"});
+    add(t, {"2015/04/29"});
+    add(t, {"2015/12/25"});
+    add(t, {"2016/01/08"});
+    add(t, {"2016/02/09"});
+    add(t, {"2016/02/09"});
+    add(t, {"2016/02/09"});
+    add(t, {"2016/02/09"});
+    add(t, {"2016/02/09"});
+    add(t, {"2016/02/22"});
+    add(t, {"2016/02/22"});
+    add(t, {"2016/03/25"});
+    add(t, {"2016/03/25"});
+    add(t, {"2016/03/25"});
+    add(t, {"2016/03/25"});
+    add(t, {"2016/03/25"});
+    add(t, {"2016/04/26"});
+    add(t, {"2016/04/26"});
+    add(t, {"2016/04/26"});
+    add(t, {"2016/09/05"});
+    add(t, {"2016/09/05"});
+    add(t, {"2016/09/05"});
+    add(t, {"2016/09/05"});
+    add(t, {"2016/10/08"});
+    add(t, {"2016/10/08"});
+    add(t, {"2016/10/08"});
+    add(t, {"2016/10/08"});
+    add(t, {"2016/10/08"});
+    add(t, {"2017/01/10"});
+    add(t, {"2017/06/07"});
+    add(t, {"2017/06/07"});
+    add(t, {"2017/06/07"});
+    add(t, {"2017/06/07"});
+    add(t, {"2017/08/05"});
+    add(t, {"2017/08/05"});
+    add(t, {"2017/08/05"});
+    add(t, {"2017/08/05"});
     Iterator* i = unique(table_scan(t));
-    Table* control = Database::new_table("control", ColumnNames{"a", "b"});
-    add(control, {"1", "10"});
-    add(control, {"2", "20"});
-    add(control, {"1", "10"});
-    add(control, {"3", "30"});
+    Table* control = Database::new_table("control", ColumnNames{"a"});
+    add(control, {"2015/01/09"});
+    add(control, {"2015/04/29"});
+    add(control, {"2015/12/25"});
+    add(control, {"2016/01/08"});
+    add(control, {"2016/02/09"});
+    add(control, {"2016/02/22"});
+    add(control, {"2016/03/25"});
+    add(control, {"2016/04/26"});
+    add(control, {"2016/09/05"});
+    add(control, {"2016/10/08"});
+    add(control, {"2017/01/10"});
+    add(control, {"2017/06/07"});
+    add(control, {"2017/08/05"});
+
     Iterator* control_iterator = table_scan(control);
-    CHECK(i->n_columns() == 2);
+    CHECK(i->n_columns() == 1);
     TWICE {
         CHECK(match(control_iterator, i));
     };

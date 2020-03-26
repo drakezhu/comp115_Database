@@ -131,7 +131,23 @@ static void test_q2_table_scan()
     add(control2, {"2017/08/05"});
     Iterator* c2 = table_scan(control2);
     Iterator* q2 =
-        IMPLEMENT_ME; // Use a table_scan on username.
+    unique(sort(project(nested_loops_join(project(nested_loops_join(project(select(table_scan(user),q2_predicate),{0}),{0},table_scan(routing),{0}),{2}),{0},table_scan(message),{0}),{1}),{0}));
+    q2->open();
+    Row* row = q2->next();
+    while(row)
+    {
+        cout << row->at(0) << endl;
+        row = q2->next();
+    }
+    q2->close();
+    Row* rrow = c2->next();
+    while(rrow)
+    {
+        cout << rrow->at(0) << endl;
+        rrow = c2->next();
+    }
+    c2->close();
+
     CHECK(match(c2, q2));
     delete q2;
     delete c2;
