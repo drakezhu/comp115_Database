@@ -115,22 +115,24 @@ void Select::open()
 }
 
 Row* Select::next()
-{   
-    Row* selected = NULL;
-    Row* row = _input->next();
-    if (row)
-    {   
-      if (_predicate(row))
-      {   
-        selected = new Row();
-        for (unsigned i = 0; i < row->size();i++)
-        {   
-          selected->append(row->at(i));
-        }
-        Row::reclaim(row);
+{
+  Row* selected = NULL;
+  Row* row = _input->next();
+  while (row)
+  {
+    if (_predicate(row))
+    {
+      selected = new Row();
+      for (unsigned i = 0; i < row->size();i++)
+      {
+        selected->append(row->at(i));
       }
+      Row::reclaim(row);
+      break;
     }
-    return selected;
+    row = _input->next();
+  }
+  return selected;
 }
 
 void Select::close()
