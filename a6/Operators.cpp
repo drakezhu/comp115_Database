@@ -311,24 +311,71 @@ NestedLoopsJoin::~NestedLoopsJoin()
 
 // Sort
 
-unsigned Sort::n_columns() 
-{
-    return IMPLEMENT_ME;
+unsigned Sort::n_columns()
+{   
+  return _sort_columns.size();
 }
 
-void Sort::open() 
+void Sort::open()
 {
-    IMPLEMENT_ME;
+  _input->open();
+  Row* row = _input->next();
+  while (row)
+  {
+    bool done = false;
+    for (auto it = _sorted.begin(); it != _sorted.end(); it++)
+    {
+        Row* r = *it;;
+        bool append = false;
+        for (unsigned i = 0; i < _sort_columns.size(); i++)
+        {
+          unsigned pos = _sort_columns.at(i);
+          if (r->at(pos) == row->at(pos))
+          {
+            continue;
+          }
+          else if (r->at(pos) > row->at(pos))
+          {
+            append = true;
+          }
+          else
+          {
+            break;
+          }
+        }
+        if (append == true)
+        {
+          _sorted.insert(it,row);
+          done = true;
+          break;
+        }
+
+    }
+    if (done == false)
+    {
+      _sorted.emplace_back(row);
+    }
+    row = _input->next();
+  }
+  _sorted_iterator = _sorted.begin();
+
 }
 
-Row* Sort::next() 
+Row* Sort::next()
 {
-    return IMPLEMENT_ME;
-}
+  Row* tmp = NULL;
+  if (_sorted_iterator != _sorted.end())
+  {
+    tmp = *_sorted_iterator;
+    _sorted_iterator++;
+  }
+  return tmp;
 
-void Sort::close() 
+}
+void Sort::close()
 {
-    IMPLEMENT_ME;
+    _sorted.clear();
+    _input->close();
 }
 
 Sort::Sort(Iterator* input, const initializer_list<unsigned>& sort_columns)
