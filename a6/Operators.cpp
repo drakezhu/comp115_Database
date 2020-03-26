@@ -394,22 +394,60 @@ Sort::~Sort()
 
 unsigned Unique::n_columns()
 {
-    return IMPLEMENT_ME;
+  return _input->n_columns();
 }
 
-void Unique::open() 
+void Unique::open()
 {
-    IMPLEMENT_ME;
+  _input->open();
 }
 
 Row* Unique::next()
 {
-    return IMPLEMENT_ME;
+  Row* row = _input->next();
+  bool found = false;
+  while (row)
+  {
+    if (!_next_unique)
+    {
+      _next_unique = row;
+      found = true;
+      break;
+    }
+    else
+    {
+      bool equal = true;
+      for (unsigned i = 0; i < n_columns(); i++)
+      {
+        if (_next_unique->at(i) != row->at(i))
+        {
+          equal = false;
+          break;
+        }
+
+      }
+      if (equal == false)
+      {
+        _next_unique = row;
+        Row::reclaim(row);
+        found = true;
+        break;
+      }
+    }
+    row = _input->next();
+  }
+  if (found == false)
+  {
+        _next_unique = NULL;
+    }
+    return _next_unique;
+
 }
 
-void Unique::close() 
+void Unique::close()
 {
-    IMPLEMENT_ME;
+    _input->close();
+    _next_unique = NULL;
 }
 
 Unique::Unique(Iterator* input)
