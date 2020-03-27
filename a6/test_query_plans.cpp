@@ -177,7 +177,7 @@ static void test_q3()
     Table *control3 = Database::new_table("control3", ColumnNames{"username"});
     add(control3, {"Moneyocracy"});
     Iterator *q3 =
-        IMPLEMENT_ME;
+project(select(nested_loops_join(table_scan(user),{0},project(nested_loops_join(table_scan(routing),{2},table_scan(message),{0}),{0,1,2,3}),{1}),q3_predicate),{1});
     Iterator* c3 = table_scan(control3);
     CHECK(match(c3, q3));
     delete q3;

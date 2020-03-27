@@ -260,11 +260,22 @@ Row* NestedLoopsJoin::next()
     }
     if (flag == true)
     {
-      return join_rows_if_match(_left_row, _right_row);
+     Row* tmp = new Row();
+      for (unsigned i = 0; i < _left_join_columns.n_columns(); i++)
+      {   
+        tmp->append(_left_row->at(i));
+      }
+      for (unsigned i = 0; i < _right_join_columns.n_unselected(); i++)
+      {   
+        tmp->append(_right_row->at(_right_join_columns.unselected(i)));
+      }   
+      Row::reclaim(_right_row);
+      return tmp;
     }
     Row::reclaim(_right_row);
     _right_row = _right->next();
   }
+  Row::reclaim(_right_row);
   return NULL;
 }
 
