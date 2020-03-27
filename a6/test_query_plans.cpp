@@ -130,8 +130,7 @@ static void test_q2_table_scan()
     add(control2, {"2017/06/07"});
     add(control2, {"2017/08/05"});
     Iterator* c2 = table_scan(control2);
-    Iterator* q2 =
-    NestedLoopsJoin(select(table_scan(user),),table_scan(routing))
+    Iterator* q2 = unique(sort(project(nested_loops_join(project(nested_loops_join(project(select(table_scan(user),q2_predicate),{0}),{0},table_scan(routing),{0}),{2}),{0},table_scan(message),{0}),{1}),{0}));
 
     CHECK(match(c2, q2));
     delete q2;
@@ -156,8 +155,8 @@ static void test_q2_index_scan()
     add(control2, {"2017/08/05"});
     Iterator* c2 = table_scan(control2);
     Row username({"Zyrianyhippy"});
-    Iterator* q2 = 
-        IMPLEMENT_ME; // Use an index_scan on username_index.
+    Index* id = user->add_index(ColumnNames{"username"});
+    Iterator* q2 = unique(sort(project(nested_loops_join(project(nested_loops_join(project( index_scan(id, &username),{0}),{0},table_scan(routing),{0}),{2}),{0},table_scan(message),{0}),{1}),{0}));
     CHECK(match(c2, q2));
     delete q2;
     delete c2;
