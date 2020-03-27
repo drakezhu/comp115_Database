@@ -194,10 +194,11 @@ static void test_q4()
     add(control4, {"2016/12/14"});
     Row unguiferous({"Unguiferous"});
     Row froglet({"Froglet"});
-    Iterator *q4 =
-        IMPLEMENT_ME;
+    Index* id = user->add_index(ColumnNames{"username"});
+    Index* id2 = user->add_index(ColumnNames{"username"});
+    Iterator *q4 = project(nested_loops_join(nested_loops_join(project(nested_loops_join(index_scan(id, &unguiferous),{0},table_scan(routing),{0}),{3,4}),{0},project(index_scan(id2, &froglet),{0}), {0}),{1},table_scan(message),{0}),{2});
     Iterator* c4 = table_scan(control4);
-    CHECK(match(c4, q4));
+        CHECK(match(c4, q4));
     delete q4;
     delete c4;
 }
