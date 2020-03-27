@@ -8,42 +8,42 @@
 #include "ColumnSelector.h"
 #include "Operators.h"
 #include "util.h"
-
+#include <iostream>
 //----------------------------------------------------------------------
 
 // TableIterator 
 
-unsigned TableIterator::n_columns()
+unsigned TableIterator::n_columns() 
 {
-  return _table->columns().size();
+    return _table->columns().size();
 }
 
-void TableIterator::open()
+void TableIterator::open() 
 {
-  _input = _table->rows().begin();
-  _end = _table->rows().end();
+    _input = _table->rows().begin();
+    _end = _table->rows().end();
 
 }
 
-Row* TableIterator::next()
+Row* TableIterator::next() 
 {
-  Row * tmp = NULL;
-  if (_input != _end)
-  {   
-    tmp = *_input;
-    _input++;
-  }
-  return tmp;
+    Row * tmp = NULL;
+    if (_input != _end)
+    {
+	tmp = *_input;
+	_input++;
+    }
+    return tmp;
 }
 
-void TableIterator::close()
-{   
+void TableIterator::close() 
+{
 }
 TableIterator::TableIterator(Table* table)
-  : _table(table)
-{   
-  _input = table->rows().begin();
-  _end = table->rows().end();
+    : _table(table)
+{
+    _input = table->rows().begin();
+    _end = table->rows().end();
 }
 
 //----------------------------------------------------------------------
@@ -51,29 +51,29 @@ TableIterator::TableIterator(Table* table)
 // IndexScan
 
 unsigned IndexScan::n_columns()
-{   
-  return _index->n_columns();
+{
+    return _index->n_columns();
 }
 
 void IndexScan::open()
-{   
-  _input = _index->begin();
-  _end = _index->end();
+{
+    _input = _index->begin();
+    _end = _index->end();
 }
 
 Row* IndexScan::next()
-{   
-  Row * tmp = NULL;
-  if (_input != _end)
-  {   
-    tmp = _input->second;
-    _input++;
-  }
-  return tmp;
+{
+    Row * tmp = NULL;
+    if (_input != _end)
+    {
+	tmp = _input->second;
+	_input++;
+    }
+    return tmp;
 }
 
 void IndexScan::close()
-{   
+{
 }
 
 IndexScan::IndexScan(Index* index, Row* lo, Row* hi)
@@ -83,20 +83,20 @@ IndexScan::IndexScan(Index* index, Row* lo, Row* hi)
 {
     for (auto it = _index->begin(); it != _index->end(); it++)
     {
-        auto v = it->first;
-        bool shouldRemove = false;
-        for (unsigned i = 0; i < v.size(); i++)
-        {
-            if (v.at(i) < _lo->at(i) || v.at(i) > _hi->at(i))
-            {
-                shouldRemove = true;
-                break;
-            }
-        }
-        if (shouldRemove == true)
-        {
-            _index->erase(it);
-        }
+	auto v = it->first;
+	bool shouldRemove = false;
+	for (unsigned i = 0; i < v.size(); i++)
+	{
+	    if (v.at(i) < _lo->at(i) || v.at(i) > _hi->at(i))
+	    {
+		shouldRemove = true;
+		break;
+	    }
+	}
+	if (shouldRemove == true)
+	{
+	    _index->erase(it);
+	}
     }
 }
 
@@ -105,41 +105,34 @@ IndexScan::IndexScan(Index* index, Row* lo, Row* hi)
 // Select
 
 unsigned Select::n_columns()
-{   
+{
     return _input->n_columns();
 }
 
 void Select::open()
-{   
+{
     _input->open();
 }
 
 Row* Select::next()
 {
-  Row* selected = NULL;
-  Row* row = _input->next();
-  while (row)
-  {
-    if (_predicate(row))
+    Row* row;;
+    while ((row = _input->next()) && !(_predicate(row)))
     {
-      selected = new Row();
-      for (unsigned i = 0; i < row->size();i++)
-      {
-        selected->append(row->at(i));
-      }
-      Row::reclaim(row);
-      break;
+	Row::reclaim(row);
     }
-    row = _input->next();
-  }
-  return selected;
+    //if (!row)
+    //{
+//	Row::reclaim(row);
+//	return NULL;
+  //  }
+    return row;
 }
 
 void Select::close()
 {
     _input->close();
 }
-
 
 Select::Select(Iterator* input, RowPredicate predicate)
     : _input(input),
@@ -200,29 +193,29 @@ Project::~Project()
 // NestedLoopsJoin
 
 unsigned NestedLoopsJoin::n_columns()
-{   
-  return _left_join_columns.n_columns() + _right_join_columns.n_columns() - _right_join_columns.n_selected();
+{
+    return _left_join_columns.n_columns() + _right_join_columns.n_columns() - _right_join_columns.n_selected();
 }
 
 void NestedLoopsJoin::open()
 {
-  _left->open();
-  _right->open();
-  _left_row = _left->next();
+    _left->open();
+    _right->open();
+    _left_row = _left->next();
 }
 
 Row* NestedLoopsJoin::join_rows_if_match(const Row* left, const Row* right)
 {
-  Row* tmp = new Row();
-  for (unsigned i = 0; i < _left_join_columns.n_columns(); i++)
-  {
-    tmp->append(left->at(i));
-  }
-  for (unsigned i = 0; i < _right_join_columns.n_unselected(); i++)
-  {
-    tmp->append(right->at(_right_join_columns.unselected(i)));
-  }
-  return tmp;
+    Row* tmp = new Row();
+    for (unsigned i = 0; i < _left_join_columns.n_columns(); i++)
+    {
+	tmp->append(left->at(i));
+    }
+    for (unsigned i = 0; i < _right_join_columns.n_unselected(); i++)
+    {
+	tmp->append(right->at(_right_join_columns.unselected(i)));
+    }
+    return tmp;
 }
 
 Row* NestedLoopsJoin::next()
@@ -230,19 +223,23 @@ Row* NestedLoopsJoin::next()
   Row* _right_row = _right->next();
   if (!_left_row || !_right_row)
   {
+    Row::reclaim(_right_row);
     return NULL;
   }
   while (_left_row)
   {
     if (!_right_row)
     {
+      Row::reclaim(_left_row);
       _left_row = _left->next();
       if (!_left_row)
       {
+	Row::reclaim(_right_row);	
         return NULL;
       }
       _right->close();
       _right->open();
+      Row::reclaim(_right_row);
       _right_row = _right->next();
     }
     bool flag = true;
@@ -258,6 +255,7 @@ Row* NestedLoopsJoin::next()
     {
       return join_rows_if_match(_left_row, _right_row);
     }
+    Row::reclaim(_right_row);
     _right_row = _right->next();
   }
   return NULL;
@@ -289,92 +287,74 @@ NestedLoopsJoin::~NestedLoopsJoin()
     Row::reclaim(_left_row);
 }
 
-NestedLoopsJoin::NestedLoopsJoin(Iterator* left,
-                                 const initializer_list<unsigned>& left_join_columns,
-                                 Iterator* right,
-                                 const initializer_list<unsigned>& right_join_columns)
-    : _left(left),
-      _right(right),
-      _left_join_columns(left->n_columns(), left_join_columns),
-      _right_join_columns(right->n_columns(), right_join_columns),
-      _left_row(NULL)
-{
-    assert(_left_join_columns.n_selected() == _right_join_columns.n_selected());
-}
-
-NestedLoopsJoin::~NestedLoopsJoin()
-{
-    delete _left;
-    delete _right;
-    Row::reclaim(_left_row);
-}
-
 //----------------------------------------------------------------------
 
 // Sort
 
-unsigned Sort::n_columns()
-{   
-  return _sort_columns.size();
-}
-
-void Sort::open()
+unsigned Sort::n_columns() 
 {
-  _input->open();
-  Row* row = _input->next();
-  while (row)
-  {
-    bool done = false;
-    for (auto it = _sorted.begin(); it != _sorted.end(); it++)
-    {
-        Row* r = *it;;
-        bool append = false;
-        for (unsigned i = 0; i < _sort_columns.size(); i++)
-        {
-          unsigned pos = _sort_columns.at(i);
-          if (r->at(pos) == row->at(pos))
-          {
-            continue;
-          }
-          else if (r->at(pos) > row->at(pos))
-          {
-            append = true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        if (append == true)
-        {
-          _sorted.insert(it,row);
-          done = true;
-          break;
-        }
-
-    }
-    if (done == false)
-    {
-      _sorted.emplace_back(row);
-    }
-    row = _input->next();
-  }
-  _sorted_iterator = _sorted.begin();
-
+    return _sort_columns.size();
 }
 
-Row* Sort::next()
+void Sort::open() 
 {
-  Row* tmp = NULL;
-  if (_sorted_iterator != _sorted.end())
-  {
-    tmp = *_sorted_iterator;
-    _sorted_iterator++;
-  }
-  return tmp;
-
+    _input->open();
+    Row* row = _input->next();
+    while (row)
+    {
+	bool done = false;
+	for (auto it = _sorted.begin(); it != _sorted.end(); it++)
+	{
+		Row* r = *it;;
+		bool append = false;
+		for (unsigned i = 0; i < _sort_columns.size(); i++)
+		{
+		    unsigned pos = _sort_columns.at(i);
+		    if (r->at(pos) == row->at(pos))
+		    {
+			continue;
+		    }
+		    else if (r->at(pos) > row->at(pos))
+		    {
+			append = true;
+		    }
+		    else
+		    {
+			break;
+		    }
+		}
+		if (append == true)
+		{
+		    _sorted.insert(it,row);
+		    done = true;
+		    break;
+		}
+		
+	}
+	if (done == false)
+	{
+	    _sorted.emplace_back(row);
+	}	    
+	row = _input->next();
+    }
+    Row::reclaim(row);
+    _sorted_iterator = _sorted.begin();
+    
 }
-void Sort::close()
+
+Row* Sort::next() 
+{
+    Row* tmp = NULL;
+    if (_sorted_iterator != _sorted.end())
+    {
+	tmp = *_sorted_iterator;
+	_sorted_iterator++;
+    }
+    return tmp;
+    
+}
+
+void Sort::close() 
 {
     _sorted.clear();
     _input->close();
@@ -393,75 +373,78 @@ Sort::~Sort()
 //----------------------------------------------------------------------
 
 // Unique
+
 unsigned Unique::n_columns()
-{   
-  return _input->n_columns();
+{
+    return _input->n_columns();
 }
 
-void Unique::open()
-{   
-  _input->open();
-  _lastString = "";
+void Unique::open() 
+{
+    _input->open();
+    _lastString = "";
 }
 
 Row* Unique::next()
 {
-  Row* row = _input->next();
-  bool found = false;
-  while (row)
-  {
-  if (_lastString == "")
-  {   
-    _next_unique = row;
-    for (unsigned i = 0; i < row->size(); i++)
-    {   
-      _lastString += row->at(i);
-    }
-    found = true;
-    break;
-  }
-  else
-  {   
-    bool equal = true;
-    for (unsigned i = 0; i < n_columns(); i++)
-    {   
-      string tmp = "";
-      for (unsigned i = 0; i < row->size(); i++)
-      {   
-        tmp += row->at(i);
-      }
-      if (tmp.compare(_lastString) != 0)
-      {   
-        equal = false;
-        break;
-      }
-    
-    }
-    if (equal == false)
-    {   
-      _next_unique = row;
-      for (unsigned i = 0; i < row->size(); i++)
-      {  
-                    _lastString = "";
+    Row* row = _input->next();
+    bool found = false;
+    while (row)
+    {
+        if (_lastString == "")
+	{
+	    _next_unique = row;
+	    for (unsigned i = 0; i < row->size(); i++)
+	    {
+		_lastString += row->at(i);
+	    }
+	    found = true;
+	    break;
+	    Row::reclaim(row);
+	}
+	else
+	{
+	    bool equal = true;
+	    for (unsigned i = 0; i < n_columns(); i++)
+	    {
+		string tmp = "";
+		for (unsigned i = 0; i < row->size(); i++)
+		{
+		    tmp += row->at(i);
+		}
+		if (tmp.compare(_lastString) != 0)
+		{
+		    equal = false;
+		    break;
+		}
+
+	    }
+	    if (equal == false)
+	    {
+	        _next_unique = row;
+		for (unsigned i = 0; i < row->size(); i++)
+                {
+		    _lastString = "";
                     _lastString += row->at(i);
-                }
-                //Row::reclaim(row);
-                found = true;
-                break;
-            }
-        }
-        row = _input->next();
+            	}
+		//Row::reclaim(row);
+		found = true;
+		break;
+	    }
+	}
+	Row::reclaim(row);
+	row = _input->next();
     }
     if (found == false)
     {
-        _next_unique = NULL;
-    }
+	_next_unique = NULL;
+    } 
 
     return _next_unique;
-
+    
 }
 
-void Unique::close()
+void Unique::close() 
 {
     _input->close();
 }
@@ -476,4 +459,5 @@ Unique::Unique(Iterator* input)
 Unique::~Unique()
 {
     delete _input;
+    delete _next_unique;
 }
