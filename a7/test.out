@@ -1,0 +1,89 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                             QUERY PLAN                              
+---------------------------------------------------------------------
+ Gather  (cost=1000.00..28083.87 rows=2 width=39)
+   Workers Planned: 2
+   ->  Parallel Seq Scan on r  (cost=0.00..27083.67 rows=1 width=39)
+         Filter: (r_2 = 0)
+(4 rows)
+
+     ?column?     
+------------------
+ ADD INDEX ON r_2
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                                                  QUERY PLAN                                                   
+---------------------------------------------------------------------------------------------------------------
+ Index Scan using r_r_2_idx on r  (cost=0.43..11.46 rows=2 width=39) (actual time=0.052..0.054 rows=2 loops=1)
+   Index Cond: (r_2 = 0)
+ Planning Time: 0.122 ms
+ Execution Time: 0.067 ms
+(4 rows)
+
+DROP INDEX
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                               QUERY PLAN                               
+------------------------------------------------------------------------
+ Gather  (cost=1000.00..29863.67 rows=17800 width=39)
+   Workers Planned: 2
+   ->  Parallel Seq Scan on r  (cost=0.00..27083.67 rows=7417 width=39)
+         Filter: (r_1p = 0)
+(4 rows)
+
+     ?column?      
+-------------------
+ ADD INDEX ON r_1P
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                                                         QUERY PLAN                                                          
+-----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on r  (cost=394.66..18207.65 rows=20933 width=39) (actual time=4.945..102.320 rows=20000 loops=1)
+   Recheck Cond: (r_1p = 0)
+   Heap Blocks: exact=16666
+   ->  Bitmap Index Scan on r_r_1p_idx  (cost=0.00..389.43 rows=20933 width=0) (actual time=2.583..2.583 rows=20000 loops=1)
+         Index Cond: (r_1p = 0)
+ Planning Time: 0.140 ms
+ Execution Time: 103.576 ms
+(7 rows)
+
+DROP INDEX
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on r  (cost=0.00..41667.00 rows=994733 width=39)
+   Filter: (r_50p = 0)
+(2 rows)
+
+      ?column?      
+--------------------
+ ADD INDEX ON r_50P
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                                                 QUERY PLAN                                                  
+-------------------------------------------------------------------------------------------------------------
+ Seq Scan on r  (cost=0.00..41667.00 rows=990200 width=39) (actual time=0.014..216.263 rows=1000000 loops=1)
+   Filter: (r_50p = 0)
+   Rows Removed by Filter: 1000000
+ Planning Time: 0.154 ms
+ Execution Time: 274.835 ms
+(5 rows)
+
+DROP INDEX
