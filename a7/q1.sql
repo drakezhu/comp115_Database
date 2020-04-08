@@ -1,7 +1,5 @@
 select 'ORIGINAL -- NO INDEXES';
 
-
-
 explain
 select *
 from r
