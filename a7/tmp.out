@@ -1,14 +1,20 @@
 CREATE INDEX
 ANALYZE
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
                                                               QUERY PLAN                                                              
 --------------------------------------------------------------------------------------------------------------------------------------
- Bitmap Heap Scan on r  (cost=27.49..2854.88 rows=868 width=39) (actual time=5.576..49.526 rows=20000 loops=1)
+ Bitmap Heap Scan on r  (cost=27.53..2863.93 rows=871 width=39) (actual time=4.971..37.320 rows=20000 loops=1)
    Recheck Cond: ((r_1p = 0) AND (r_10p = 0) AND (r_50p = 0))
    Heap Blocks: exact=16666
-   ->  Bitmap Index Scan on r_r_1p_r_10p_r_50p_idx  (cost=0.00..27.28 rows=868 width=0) (actual time=2.956..2.956 rows=20000 loops=1)
+   ->  Bitmap Index Scan on r_r_1p_r_10p_r_50p_idx  (cost=0.00..27.32 rows=871 width=0) (actual time=2.607..2.607 rows=20000 loops=1)
          Index Cond: ((r_1p = 0) AND (r_10p = 0) AND (r_50p = 0))
- Planning Time: 1.441 ms
- Execution Time: 50.727 ms
+ Planning Time: 0.362 ms
+ Execution Time: 38.711 ms
 (7 rows)
 
 DROP INDEX
