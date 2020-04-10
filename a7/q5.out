@@ -1,0 +1,11 @@
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=0.85..108.82 rows=20 width=8) (actual time=0.058..0.277 rows=40 loops=1)
+   ->  Index Scan using s_s_4_idx on s  (cost=0.42..19.76 rows=4 width=8) (actual time=0.025..0.036 rows=4 loops=1)
+         Index Cond: (s_4 = 0)
+   ->  Index Scan using r_r_50p_s_id_idx on r  (cost=0.43..22.21 rows=5 width=8) (actual time=0.024..0.058 rows=10 loops=4)
+         Index Cond: ((r_50p = 0) AND (s_id = s.s_id))
+ Planning Time: 3.803 ms
+ Execution Time: 0.344 ms
+(7 rows)
+

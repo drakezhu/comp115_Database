@@ -1,0 +1,16 @@
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ HashAggregate  (cost=18821.05..19014.48 rows=19343 width=60) (actual time=124.085..128.555 rows=20000 loops=1)
+   Group Key: r.r_id, r.r_2, r.r_10, r.r_1p, r.r_10p, r.r_50p, r.r_filler, r.s_id
+   ->  Append  (cost=366.26..18434.19 rows=19343 width=60) (actual time=6.437..112.288 rows=20010 loops=1)
+         ->  Bitmap Heap Scan on r  (cost=366.26..18099.81 rows=19333 width=39) (actual time=6.436..109.808 rows=20000 loops=1)
+               Recheck Cond: (r_1p = 0)
+               Heap Blocks: exact=16666
+               ->  Bitmap Index Scan on r_r_1p_r_10_idx  (cost=0.00..361.43 rows=19333 width=0) (actual time=3.889..3.889 rows=20000 loops=1)
+                     Index Cond: (r_1p = 0)
+         ->  Index Scan using r_r_10_idx on r r_1  (cost=0.43..44.23 rows=10 width=39) (actual time=0.027..0.035 rows=10 loops=1)
+               Index Cond: (r_10 = 0)
+ Planning Time: 1.983 ms
+ Execution Time: 130.285 ms
+(12 rows)
+
