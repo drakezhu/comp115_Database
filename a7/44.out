@@ -1,0 +1,25 @@
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=1.69..69.31 rows=25 width=19) (actual time=0.049..0.136 rows=30 loops=1)
+   ->  Nested Loop  (cost=1.26..67.02 rows=2 width=23) (actual time=0.034..0.074 rows=3 loops=1)
+         ->  Nested Loop  (cost=0.84..66.07 rows=2 width=8) (actual time=0.026..0.048 rows=3 loops=1)
+               ->  Index Scan using u_u_5_idx on u  (cost=0.42..23.83 rows=5 width=4) (actual time=0.017..0.021 rows=5 loops=1)
+                     Index Cond: (u_5 = 0)
+               ->  Index Scan using s_u_id_t_id_idx on s  (cost=0.42..8.44 rows=1 width=12) (actual time=0.004..0.004 rows=1 loops=5)
+                     Index Cond: (u_id = u.u_id)
+         ->  Index Scan using t_pkey on t  (cost=0.42..0.47 rows=1 width=19) (actual time=0.008..0.008 rows=1 loops=3)
+               Index Cond: (t_id = s.t_id)
+   ->  Index Only Scan using r_s_id_r_50p_idx on r  (cost=0.43..1.05 rows=10 width=4) (actual time=0.011..0.019 rows=10 loops=3)
+         Index Cond: (s_id = s.s_id)
+         Heap Fetches: 30
+ Planning Time: 0.863 ms
+ Execution Time: 0.212 ms
+(14 rows)
+
+DROP INDEX

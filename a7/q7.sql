@@ -1,3 +1,11 @@
+create index on r(s_id);
+analyze r;
+create index on s(t_id, s_20);
+analyze s;
+create index on t(t_5);
+analyze t;
+
+
 explain analyze
 select *
 from r
@@ -11,3 +19,5 @@ where s_id in (
         where t_5 = 0
     )
 );
+
+drop index r_s_id_idx, t_t_5_idx, s_t_id_s_20_idx;

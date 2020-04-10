@@ -8,10 +8,6 @@ analyze r;
 explain analyze
 select * 
 from r
-where r_1p = 0
-union
-select *
-from r
-where r_10 = 0;
+where r_1p = 0 or r_10 = 0;
 
 drop index r_r_1p_idx, r_r_10_idx, r_r_1p_r_10_idx;
