@@ -1,0 +1,81 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                             QUERY PLAN                              
+---------------------------------------------------------------------
+ Gather  (cost=1000.00..28083.87 rows=2 width=39)
+   Workers Planned: 2
+   ->  Parallel Seq Scan on r  (cost=0.00..27083.67 rows=1 width=39)
+         Filter: (r_2 = 0)
+(4 rows)
+
+     ?column?     
+------------------
+ ADD INDEX ON r_2
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                             QUERY PLAN                              
+---------------------------------------------------------------------
+ Index Scan using r_r_2_idx on r  (cost=0.43..11.44 rows=2 width=39)
+   Index Cond: (r_2 = 0)
+(2 rows)
+
+DROP INDEX
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                               QUERY PLAN                               
+------------------------------------------------------------------------
+ Gather  (cost=1000.00..30103.67 rows=20200 width=39)
+   Workers Planned: 2
+   ->  Parallel Seq Scan on r  (cost=0.00..27083.67 rows=8417 width=39)
+         Filter: (r_1p = 0)
+(4 rows)
+
+     ?column?      
+-------------------
+ ADD INDEX ON r_1p
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                                  QUERY PLAN                                   
+-------------------------------------------------------------------------------
+ Bitmap Heap Scan on r  (cost=375.43..18149.90 rows=20000 width=39)
+   Recheck Cond: (r_1p = 0)
+   ->  Bitmap Index Scan on r_r_1p_idx  (cost=0.00..370.43 rows=20000 width=0)
+         Index Cond: (r_1p = 0)
+(4 rows)
+
+DROP INDEX
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on r  (cost=0.00..41667.00 rows=995933 width=39)
+   Filter: (r_50p = 0)
+(2 rows)
+
+      ?column?      
+--------------------
+ ADD INDEX ON r_50p
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on r  (cost=0.00..41667.00 rows=997067 width=39)
+   Filter: (r_50p = 0)
+(2 rows)
+
+DROP INDEX
