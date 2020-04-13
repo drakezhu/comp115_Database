@@ -1,0 +1,45 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=3941.61..32120.03 rows=20 width=8) (actual time=23.163..315.698 rows=40 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   ->  Parallel Hash Join  (cost=2941.61..31118.03 rows=8 width=8) (actual time=14.692..308.413 rows=13 loops=3)
+         Hash Cond: (r.s_id = s.s_id)
+         ->  Parallel Seq Scan on r  (cost=0.00..27083.67 rows=416278 width=8) (actual time=0.017..264.961 rows=333333 loops=3)
+               Filter: (r_50p = 0)
+               Rows Removed by Filter: 333333
+         ->  Parallel Hash  (cost=2941.59..2941.59 rows=2 width=8) (actual time=6.503..6.503 rows=1 loops=3)
+               Buckets: 1024  Batches: 1  Memory Usage: 104kB
+               ->  Parallel Seq Scan on s  (cost=0.00..2941.59 rows=2 width=8) (actual time=1.423..6.437 rows=1 loops=3)
+                     Filter: (s_4 = 0)
+                     Rows Removed by Filter: 66665
+ Planning Time: 0.745 ms
+ Execution Time: 315.757 ms
+(15 rows)
+
+              ?column?              
+------------------------------------
+ ADD INDEX ON r(r_50p,s_id), s(s_4)
+(1 row)
+
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=0.85..109.15 rows=20 width=8) (actual time=0.059..0.215 rows=40 loops=1)
+   ->  Index Scan using s_s_4_idx on s  (cost=0.42..19.73 rows=4 width=8) (actual time=0.027..0.030 rows=4 loops=1)
+         Index Cond: (s_4 = 0)
+   ->  Index Scan using r_r_50p_s_id_idx on r  (cost=0.43..22.31 rows=5 width=8) (actual time=0.023..0.044 rows=10 loops=4)
+         Index Cond: ((r_50p = 0) AND (s_id = s.s_id))
+ Planning Time: 0.232 ms
+ Execution Time: 0.241 ms
+(7 rows)
+
+DROP INDEX

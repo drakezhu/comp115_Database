@@ -1,0 +1,60 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                                                                  QUERY PLAN                                                                   
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=9445.99..37573.87 rows=25 width=19) (actual time=147.136..476.186 rows=30 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   ->  Parallel Hash Join  (cost=8445.99..36571.37 rows=10 width=19) (actual time=134.720..464.393 rows=10 loops=3)
+         Hash Cond: (r.s_id = s.s_id)
+         ->  Parallel Seq Scan on r  (cost=0.00..25000.33 rows=833333 width=4) (actual time=0.568..282.059 rows=666667 loops=3)
+         ->  Parallel Hash  (cost=8445.98..8445.98 rows=1 width=23) (actual time=99.326..99.326 rows=1 loops=3)
+               Buckets: 1024  Batches: 1  Memory Usage: 72kB
+               ->  Nested Loop  (cost=5489.63..8445.98 rows=1 width=23) (actual time=90.893..99.275 rows=1 loops=3)
+                     ->  Parallel Hash Join  (cost=5489.21..8445.51 rows=1 width=8) (actual time=90.770..99.046 rows=1 loops=3)
+                           Hash Cond: (s.u_id = u.u_id)
+                           ->  Parallel Seq Scan on s  (cost=0.00..2647.47 rows=117647 width=12) (actual time=0.010..8.174 rows=66667 loops=3)
+                           ->  Parallel Hash  (cost=5489.18..5489.18 rows=3 width=4) (actual time=83.623..83.624 rows=2 loops=3)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 104kB
+                                 ->  Parallel Seq Scan on u  (cost=0.00..5489.18 rows=3 width=4) (actual time=7.724..83.474 rows=2 loops=3)
+                                       Filter: (u_5 = 0)
+                                       Rows Removed by Filter: 133332
+                     ->  Index Scan using t_pkey on t  (cost=0.42..0.47 rows=1 width=19) (actual time=0.226..0.226 rows=1 loops=3)
+                           Index Cond: (t_id = s.t_id)
+ Planning Time: 5.109 ms
+ Execution Time: 476.301 ms
+(21 rows)
+
+                  ?column?                   
+---------------------------------------------
+ ADD INDEX ON r(s_id), s(u_id, t_id), u(u_5)
+(1 row)
+
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=1.69..69.31 rows=25 width=19) (actual time=0.050..0.150 rows=30 loops=1)
+   ->  Nested Loop  (cost=1.26..67.02 rows=2 width=23) (actual time=0.041..0.084 rows=3 loops=1)
+         ->  Nested Loop  (cost=0.84..66.07 rows=2 width=8) (actual time=0.030..0.058 rows=3 loops=1)
+               ->  Index Scan using u_u_5_idx on u  (cost=0.42..23.83 rows=5 width=4) (actual time=0.025..0.029 rows=5 loops=1)
+                     Index Cond: (u_5 = 0)
+               ->  Index Scan using s_u_id_t_id_idx on s  (cost=0.42..8.44 rows=1 width=12) (actual time=0.005..0.005 rows=1 loops=5)
+                     Index Cond: (u_id = u.u_id)
+         ->  Index Scan using t_pkey on t  (cost=0.42..0.47 rows=1 width=19) (actual time=0.008..0.008 rows=1 loops=3)
+               Index Cond: (t_id = s.t_id)
+   ->  Index Only Scan using r_s_id_idx on r  (cost=0.43..1.05 rows=10 width=4) (actual time=0.012..0.020 rows=10 loops=3)
+         Index Cond: (s_id = s.s_id)
+         Heap Fetches: 30
+ Planning Time: 0.594 ms
+ Execution Time: 0.178 ms
+(14 rows)
+
+DROP INDEX

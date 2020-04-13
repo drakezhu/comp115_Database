@@ -1,0 +1,7 @@
+Original cost for query without creating any index is: 31234.43
+After adding index r(s_id), index s(t_id, s_20), index t(t_5) the cost for the query is: 65.84
+
+Analysis:
+First we use the most selevtive column which is t_5 in this case and find the corresponding qualified index than apply to table s, then we create the index with both foreign key and the condition column which is s_20 to find the qualified rows. After we generate the second index, we can find what we want in table r by creating index on column s_id which is a foreign key with index s(t_id, s_20). We can decrease the cost from 31234.43 to only 110.
+The equivalent query is to use the join clause, and create these index as well. But the basic performance(not using any index) is much better, when we apply the index, the cost are the similar. The rewritten query is:
+explain select * from r join s using (s_id) join t using (t_id) where t_5 = 0 and s_20 = 0;

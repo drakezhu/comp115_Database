@@ -1,0 +1,7 @@
+Result:
+Original cost for query r_2 = 0, r_1p = 0, r_50p = 0 without creating any index is: 28083.87, 30103.67, 41667.00
+After adding index(r_2), index(r_1p), index(r_50p) the cost for each query is: 11.44, 18149.90, 41667.00 
+
+1. The reason that similar queries get different time complexity is caused by the the selectivity of the data. For each column we want to find the value 0, but the proportion of 0 are not the same in each columns. In the most extreme case, if a column is composed of all 0 values, this will indeedly use a sequential scan instead of index scan(in real operations, more than 10% selectivity will lead to a sequential scan). And even both column use index scan, in this case, which are r_2 and r_1p, the size of their corresponding index are not equal, and this is the main reason that lead to different plans as well.
+
+2. If we want to check the selectivity of each column, we need to run the normal query first. After running "select count(*) from r;" we know that there are 2,000,000 rows in table r. And we check each condition for r_2, r_1p, r_50p. We find that their qualified number of rows are: 2, 2000, 100000. And their proportion are: 0.0001%, 0.1%, 50%. Based on the selectivity rule, we will use an index scan for r_2 and r_1p since their selectivity is less than 10%. And query plan will use sequtial scan on r_50p since its selectivity is 50%. 

@@ -1,0 +1,6 @@
+Result:
+Original cost for query without creating any index is: 32120.03
+After adding index r(r_50p,s_id), index s(s_4) the cost for the query is: 109.15
+
+Analysis:
+We firstly use index s_4 because this is most selective, only 4 qualified rows in 200000 overall rows; then combined this index with another index with foreign key s_id and r_50p as another column. The reason that we choose s_4 instead of r_50p is that r_50p is not selective since half of the rows are qualified.

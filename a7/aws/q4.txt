@@ -1,0 +1,6 @@
+Result:
+Original cost for query without creating any index is: 37573.87
+After adding index s(s_id), index s(u_id, t_id), index u(u_5) the cost for the query is: 69.33
+
+Analysis:
+Firstly the condition that u_5 = 0 is selective since there are only 5 qualified results in 400000 rows. Then we create u_id and t_id in table s thus apply the results that generated from former index as the new index. Thus we can avoid cost by creating these three index. 

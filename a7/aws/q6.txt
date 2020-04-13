@@ -1,0 +1,8 @@
+Result:
+Original cost for query without creating any index is: 58281.50
+After adding index r(r_1p), index r(r_10), index r(r_1p, r_10) the cost for the query is: 19229.81
+
+Analysis:
+We can imagine the query using two tables, r1 and r2, which are equivalent. By creating the index r_1p and r_10 we can decrease the cost from sequence scan to index scan, and using a index r_1p, r_10 to connect them together.
+ And this query is equal to the query: select * from r where r_1p = 0 or r_10 = 0; in this query we can create index as before and the cost will be 18205.61
+

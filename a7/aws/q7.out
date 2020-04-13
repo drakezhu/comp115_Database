@@ -1,0 +1,58 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                                                            QUERY PLAN                                                             
+-----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=4045.55..31234.43 rows=10 width=39) (actual time=37.037..299.558 rows=50 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   ->  Parallel Hash Semi Join  (cost=3045.55..30233.43 rows=4 width=39) (actual time=32.239..289.792 rows=17 loops=3)
+         Hash Cond: (r.s_id = s.s_id)
+         ->  Parallel Seq Scan on r  (cost=0.00..25000.33 rows=833333 width=39) (actual time=0.463..198.585 rows=666667 loops=3)
+         ->  Parallel Hash  (cost=3045.54..3045.54 rows=1 width=4) (actual time=9.315..9.315 rows=2 loops=3)
+               Buckets: 1024  Batches: 1  Memory Usage: 104kB
+               ->  Nested Loop  (cost=0.42..3045.54 rows=1 width=4) (actual time=2.443..9.217 rows=2 loops=3)
+                     ->  Parallel Seq Scan on s  (cost=0.00..2941.59 rows=12 width=8) (actual time=0.195..7.204 rows=7 loops=3)
+                           Filter: (s_20 = 0)
+                           Rows Removed by Filter: 66660
+                     ->  Index Scan using t_pkey on t  (cost=0.42..8.44 rows=1 width=4) (actual time=0.299..0.299 rows=0 loops=20)
+                           Index Cond: (t_id = s.t_id)
+                           Filter: (t_5 = 0)
+                           Rows Removed by Filter: 1
+ Planning Time: 2.469 ms
+ Execution Time: 299.681 ms
+(18 rows)
+
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+CREATE INDEX
+ANALYZE
+                  ?column?                  
+--------------------------------------------
+ ADD INDEX ON r(s_id),s(t_id, s_20), t(t_5)
+(1 row)
+
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=66.26..110.00 rows=10 width=39) (actual time=0.088..0.173 rows=50 loops=1)
+   ->  HashAggregate  (cost=65.83..65.84 rows=1 width=4) (actual time=0.072..0.073 rows=5 loops=1)
+         Group Key: s.s_id
+         ->  Nested Loop  (cost=4.88..65.83 rows=1 width=4) (actual time=0.034..0.067 rows=5 loops=1)
+               ->  Bitmap Heap Scan on t  (cost=4.46..23.58 rows=5 width=4) (actual time=0.027..0.032 rows=5 loops=1)
+                     Recheck Cond: (t_5 = 0)
+                     Heap Blocks: exact=5
+                     ->  Bitmap Index Scan on t_t_5_idx  (cost=0.00..4.46 rows=5 width=0) (actual time=0.024..0.024 rows=5 loops=1)
+                           Index Cond: (t_5 = 0)
+               ->  Index Scan using s_t_id_s_20_idx on s  (cost=0.42..8.44 rows=1 width=8) (actual time=0.006..0.006 rows=1 loops=5)
+                     Index Cond: ((t_id = t.t_id) AND (s_20 = 0))
+   ->  Index Scan using r_s_id_idx on r  (cost=0.43..44.06 rows=10 width=39) (actual time=0.009..0.018 rows=10 loops=5)
+         Index Cond: (s_id = s.s_id)
+ Planning Time: 0.454 ms
+ Execution Time: 0.241 ms
+(15 rows)
+
+DROP INDEX

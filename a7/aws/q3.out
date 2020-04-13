@@ -1,0 +1,36 @@
+        ?column?        
+------------------------
+ ORIGINAL -- NO INDEXES
+(1 row)
+
+                                                      QUERY PLAN                                                       
+-----------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..34913.27 rows=5796 width=39) (actual time=0.679..540.050 rows=20000 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   ->  Parallel Seq Scan on r  (cost=0.00..33333.67 rows=2415 width=39) (actual time=0.194..531.490 rows=6667 loops=3)
+         Filter: ((r_1p >= 0) AND (r_1p <= 5) AND (r_10p = 0) AND (r_50p = 0))
+         Rows Removed by Filter: 660000
+ Planning Time: 0.643 ms
+ Execution Time: 541.951 ms
+(8 rows)
+
+            ?column?             
+---------------------------------
+ ADD INDEX ON (r_50p,r_10p,r_1p)
+(1 row)
+
+CREATE INDEX
+ANALYZE
+                                                               QUERY PLAN                                                               
+----------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on r  (cost=183.13..12159.75 rows=5948 width=39) (actual time=5.900..181.439 rows=20000 loops=1)
+   Recheck Cond: ((r_50p = 0) AND (r_10p = 0) AND (r_1p >= 0) AND (r_1p <= 5))
+   Heap Blocks: exact=16666
+   ->  Bitmap Index Scan on r_r_50p_r_10p_r_1p_idx  (cost=0.00..181.65 rows=5948 width=0) (actual time=3.489..3.489 rows=20000 loops=1)
+         Index Cond: ((r_50p = 0) AND (r_10p = 0) AND (r_1p >= 0) AND (r_1p <= 5))
+ Planning Time: 0.154 ms
+ Execution Time: 182.657 ms
+(7 rows)
+
+DROP INDEX

@@ -1,0 +1,6 @@
+Result:
+Original cost for the query without creating any index is: 32353.43
+After adding index(r_50p,r_1p,r_10p) the cost for the query is: 3259.92
+
+Analysis:
+Although r_50p has a bad selectivity that 50% are qualified rows, but in this case, we are doing "and" combined three conditions, so we create an index of three columns can avoid some random access. Bacially in this case, we want to create index in order of (r_1p, r_10p, r_50p) order by their selectivity. But the postgres mechanism works not in a same way. 
