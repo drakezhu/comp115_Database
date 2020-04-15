@@ -46,3 +46,7 @@ const char* field(PGresult* result, int row, int column);
  * execution by calling PGclear on result.
  */
 void end_query(PGresult* result);
+
+static void oops(PGconn *cnxn, const char* problem);
+
+PGconn * cnxn;
