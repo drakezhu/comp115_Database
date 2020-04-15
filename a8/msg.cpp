@@ -38,20 +38,29 @@ int add_member(PGconn* connection, const char* name, const char* birth_date)
     PGresult * res = query(connection, INSERT_MEMBER, 2, params);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
             PQclear(res);
-            oops(connection, "insert failed");
             return -1;
         }
-        printf("Rows inserted: %s\n", PQcmdTuples(res));
         PQclear(res);
-    return 0;
+    res = PQexec(connection, "select lastval()");
+    int member_id = atoi(PQgetvalue(res, 0, 0));
+    PQclear(res);
+    return member_id;
 }
 
 int add_message(PGconn* connection, const char* message_date, const char* message_text)
 {
-    // Run INSERT_MESSAGE
-    // Run PK_VALUE
-    // Return PK_VALUE output (the message_id just inserted)
-    return -1;
+    const char* params[] = {message_date, message_text};
+
+    PGresult * res = query(connection, INSERT_MESSAGE, 2, params);
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+            PQclear(res);
+            return -1;
+        }
+        PQclear(res);
+    res = PQexec(connection, "select lastval()");
+    int message_id = atoi(PQgetvalue(res, 0, 0));
+    PQclear(res);
+    return message_id;
 }
 
 int add_routing(PGconn* connection, const char* from_member_id, const char* to_member_id, const char* message_ids)

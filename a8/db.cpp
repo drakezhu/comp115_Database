@@ -41,7 +41,27 @@ PGresult* query(PGconn* connection, const char* sql, int n_params, const char** 
 
 int update(PGconn* connection, const char* sql, int n_params, const char** params)
 {
-    return -1;
+    PGresult *res = PQexecParams(connection,
+    sql,
+    n_params,
+    NULL,
+    params,
+    NULL,
+    NULL,
+    0
+    );
+    if (PQresultStatus(res) == PGRES_FATAL_ERROR)
+    {
+        PQclear(res);
+        return -1;
+    }
+    else if (PQresultStatus(res) == PGRES_COMMAND_OK)
+    {
+        return atoi(PQcmdTuples(res));
+    }
+    fprintf(stderr, "Update Failed\n");
+    PQclear(res);
+    return -2;
 }
 
 const char* field(PGresult* result, int row, int column)
