@@ -47,6 +47,4 @@ const char* field(PGresult* result, int row, int column);
  */
 void end_query(PGresult* result);
 
-static void oops(PGconn *cnxn, const char* problem);
-
-PGconn * cnxn;
+void oops(PGconn *cnxn, const char* problem);

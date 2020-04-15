@@ -3,7 +3,6 @@
 
 PGconn* connect_to_database(const char* host, const char* dbname, const char* user, const char* password)
 {
-    printf("hello world!\n");
     char cnxn_info[255];
     strcpy(cnxn_info,"host = ");
     strcat(cnxn_info,host);
@@ -18,16 +17,26 @@ PGconn* connect_to_database(const char* host, const char* dbname, const char* us
      {
           oops(cnxn, "cnxnection to database failed");
      }
+    return cnxn
 }
 
 void disconnect_from_database(PGconn* connection)
 {
-    PQfinish(cnxn);
+    PQfinish(connection);
 }
 
 PGresult* query(PGconn* connection, const char* sql, int n_params, const char** params)
 {
-    return NULL;
+    PGresult *res = PQexecParams(connection,
+    sql,
+    n_params,
+    NULL,
+    params,
+    NULL,
+    NULL,
+    0
+    )
+    return res;
 }
 
 int update(PGconn* connection, const char* sql, int n_params, const char** params)
@@ -44,7 +53,7 @@ void end_query(PGresult* result)
 {
 }
 
-static void oops(PGconn *cnxn, const char* problem)
+void oops(PGconn *cnxn, const char* problem)
 {
     fprintf(stderr, "%s: %s", problem, PQerrorMessage(cnxn));
     PQfinish(cnxn);

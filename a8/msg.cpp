@@ -33,10 +33,17 @@ static const char* SENDER_AND_RECEIVER_QUERY = ""
 
 int add_member(PGconn* connection, const char* name, const char* birth_date)
 {
-    // Run INSERT_MEMBER
-    // Run PK_VALUE
-    // Return PK_VALUE output (the member_id just inserted)
-    return -1;
+    const char* params[] = {name, birth_date};
+
+    PGresult * res = query(connection, INSERT_MEMBER, 2, params);
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+            PQclear(res);
+            oops(connection, "insert failed");
+            return -1;
+        }
+        printf("Rows inserted: %s\n", PQcmdTuples(res));
+        PQclear(res);
+    return 0;
 }
 
 int add_message(PGconn* connection, const char* message_date, const char* message_text)
