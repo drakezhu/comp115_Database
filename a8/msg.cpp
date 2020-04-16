@@ -41,7 +41,7 @@ int add_member(PGconn* connection, const char* name, const char* birth_date)
             return -1;
         }
         PQclear(res);
-    res = PQexec(connection, "select lastval()");
+    res = PQexec(connection, PK_VALUE);
     int member_id = atoi(PQgetvalue(res, 0, 0));
     PQclear(res);
     return member_id;
@@ -57,7 +57,7 @@ int add_message(PGconn* connection, const char* message_date, const char* messag
             return -1;
         }
         PQclear(res);
-    res = PQexec(connection, "select lastval()");
+    res = PQexec(connection, PK_VALUE);
     int message_id = atoi(PQgetvalue(res, 0, 0));
     PQclear(res);
     return message_id;
@@ -65,19 +65,52 @@ int add_message(PGconn* connection, const char* message_date, const char* messag
 
 int add_routing(PGconn* connection, const char* from_member_id, const char* to_member_id, const char* message_ids)
 {
-    // Run INSERT_ROUTING
-    // Return the value returned by the insert_routing stored procedure
-    return -1;
+    int len = 1;
+    for (int i = 0; i < strlen(message_ids); i++)
+    {
+        if (message_ids[i] == ',')
+            len += 1;
+    }
+    const char* params[] = {from_member_id, to_member_id, message_ids};
+    query(connection, INSERT_ROUTING, 3, params);
+    return len;
 }
 
 int birth_date(PGconn* connection, const char* name, char* buffer)
 {
-    // Run BIRTH_DATE_QUERY
-    return -1;
+    const char* params[] = {name};
+
+    PGresult * res = query(connection, BIRTH_DATE_QUERY, 1, params);
+    if (PQntuples(res) > 0)
+    {
+        strcpy(buffer, PQgetvalue(res, 0, 0));
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+    
 }
 
 int senders_and_receivers(PGconn* connection, const char* date, int max_results, char* buffer[])
 {
-    // Run SENDER_AND_RECEIVER_QUERY
-    return -1;
+    const char* params[] = {date};
+    PGresult * res = query(connection, SENDER_AND_RECEIVER_QUERY, 1, params);
+    if (PQntuples(res) > max_results)
+    {
+        fprintf(stderr, "Maximum Results Reached Error\n");
+        exit(1);
+    }
+    for (int i = 0; i < PQntuples(res); i++)
+    {
+        char tmp[255];
+        strcpy(tmp,PQgetvalue(res, i, 0));
+        strcat(tmp,",");
+        strcat(tmp, PQgetvalue(res, i, 1));
+        strcpy(*buffer,tmp);
+        buffer++;
+    }
+
+    return PQntuples(res);
 }

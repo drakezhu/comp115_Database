@@ -15,7 +15,7 @@ PGconn* connect_to_database(const char* host, const char* dbname, const char* us
      PGconn * cnxn = PQconnectdb(cnxn_info);
      if (PQstatus(cnxn) != CONNECTION_OK)
      {
-          oops(cnxn, "cnxnection to database failed");
+        fprintf(stderr, "Connect Failed\n");
      }
     return cnxn
 }
@@ -66,16 +66,14 @@ int update(PGconn* connection, const char* sql, int n_params, const char** param
 
 const char* field(PGresult* result, int row, int column)
 {
-    return NULL;
+    if (PQgetisnull(result, row, column))
+    {
+        return NULL;
+    }
+    return PQgetvalue(result, row, column);
 }
 
 void end_query(PGresult* result)
 {
-}
-
-void oops(PGconn *cnxn, const char* problem)
-{
-    fprintf(stderr, "%s: %s", problem, PQerrorMessage(cnxn));
-    PQfinish(cnxn);
-    exit(1);
+    PQclear(res);
 }

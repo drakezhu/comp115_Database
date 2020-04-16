@@ -10,7 +10,13 @@ declare
     mid int;
     insert_count int = 0;
 begin
-    -- IMPLEMENT ME
-    return -1;
+    FOREACH x IN message_ids $1
+    LOOP
+        insert into routing(from_member_id, to_member_id, x);
+        insert_count := insert_count+1;
+    END LOOP;
+    
+    
+    return insert_count;
 end
 $$ language plpgsql;
