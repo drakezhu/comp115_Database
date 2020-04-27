@@ -1,0 +1,13 @@
+1) In auto-commit mode (no transaction boundaries), there are bad
+balances and bad audits, but nothing else goes wrong. Explain this by
+demonstrating the interleaving of the steps of two processes that can
+produce a) a bad balance, and b) a bad audit.
+
+2) With READ COMMITTED isolation, there are bad balances, but nothing
+else goes wrong. Explain this, again by showing an interleaving of the
+steps of two processes.
+
+3) With SERIALIZABLE isolation, the only problem is failed
+transfers. (You could conceivably see a failed commit too.) Explain a
+failed transfer by showing an interleaving of the steps of two
+processes that produces this result.
