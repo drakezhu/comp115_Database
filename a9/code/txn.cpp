@@ -39,14 +39,30 @@ int BankOpOutcome::amount() const
  */
 static int update_balance(PGconn* connection, int account_id, int amount)
 {
-    // Run SQL to increment balance by amount.
-    return -1;
+    static const char* UPDATE_BALANCE =
+        "update account set balance = balance + $2 where account_id = $1";
+    
+    char str_account_id[256],str_amount[256];
+    sprintf(str_account_id, "%d", account_id);
+    sprintf(str_amount, "%d", amount);
+    
+    const char* params[] = {str_account_id, str_amount};
+    int res = update(connection, UPDATE_BALANCE, 2, params);
+        if (res >= 0) {
+	    return 1;
+        }
+    return 0;
 }
 
 BankOpOutcome read_balance(PGconn* connection, int account_id)
 {
-    // Run SQL to read balance of account.
-    return -1;
+    
+    char sql[256];
+    
+    sprintf(sql, "select balance from account where account_id = %d", account_id);
+    
+    PGresult * res = query(connection, sql, 0, NULL);
+    return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
 }
 
 BankOpOutcome transfer(PGconn* connection, int from_id, int to_id, int amount)
@@ -65,6 +81,10 @@ BankOpOutcome transfer(PGconn* connection, int from_id, int to_id, int amount)
 
 BankOpOutcome audit(PGconn* connection)
 {
-    // Run SQL to compute sum of balances.
-    return -1;
+    static const char* AUDIT_BALANCE =
+        "select sum(balance) from account";
+
+    PGresult * res = query(connection, AUDIT_BALANCE, 0, NULL);
+    //printf("res: %s", PQgetvalue(res, 0, 0));
+    return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
 }

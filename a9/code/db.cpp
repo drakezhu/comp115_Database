@@ -1,6 +1,6 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include "db.h"
-
+#include <string.h>
 PGconn* connect_to_database(const char* host, const char* dbname, const char* user, const char* password)
 {
     char connection_info[100];
@@ -21,28 +21,41 @@ void disconnect_from_database(PGconn* connection)
 
 void begin_transaction(PGconn* connection, const char* isolation)
 {
-    
+    char sql[100];
+    sprintf(sql, "begin isolation level %s", isolation); 
+    PGresult* result = PQexecParams(connection, sql, 0, NULL, NULL, NULL, NULL, 0);
+    if (PQresultStatus(result) != PGRES_COMMAND_OK) 
+    {
+            printf("Begin Transaction Failed\n");
+            exit(1);
+    }
 }
 
 int commit_transaction(PGconn* connection)
 {
-    return -1;
+    char sql[100];
+    sprintf(sql, "commit"); 
+    PGresult* result = PQexecParams(connection, sql, 0, NULL, NULL, NULL, NULL, 0);
+    if (PQresultStatus(result) == PGRES_COMMAND_OK) 
+    {
+        return 1;
+    }
+    return 0;
 }
-
 PGresult* query(PGconn* connection, const char* sql, int n_params, const char** params)
 {
     PGresult* result = PQexecParams(connection, sql, n_params, NULL, params, NULL, NULL, 0);
-        ExecStatusType status = PQresultStatus(result);
-        if (status == PGRES_FATAL_ERROR) {
-            PQclear(result);
-            return NULL;
-        } else if (status != PGRES_TUPLES_OK) {
-            fprintf(stderr, "query failed with status %d: %s\n", status, sql);
-            PQclear(result);
-            return NULL;
-        } else {
-            return result;
-        };
+    ExecStatusType status = PQresultStatus(result);
+    if (status == PGRES_FATAL_ERROR) {
+        PQclear(result);
+        return NULL;
+    } else if (status != PGRES_TUPLES_OK) {
+        fprintf(stderr, "query failed with status %d: %s\n", status, sql);
+        PQclear(result);
+        return NULL;
+    } else {
+        return result;
+    };
 }
 
 int update(PGconn* connection, const char* sql, int n_params, const char** params)
@@ -61,7 +74,6 @@ int update(PGconn* connection, const char* sql, int n_params, const char** param
         PQclear(result);
         return update_count;
     }
-
 }
 
 const char* field(PGresult* result, int row, int column)
@@ -74,5 +86,6 @@ const char* field(PGresult* result, int row, int column)
 
 void end_query(PGresult* result)
 {
-    PQclear(result);    
+    PQclear(result);
 }
+

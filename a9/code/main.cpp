@@ -29,6 +29,7 @@ static void setup_database(const char* host, const char* dbname, const char* use
     }
     commit_transaction(connection);
     disconnect_from_database(connection);
+//fprintf(stderr, "good\n");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,6 +68,7 @@ void run_transfers(const char* isolation,
         // Generate a transfer amount > 0
         outcome = read_balance(connection, source_id);
         if (outcome.status() == BALANCE_FAILED) {
+
             failed_balance++;
         } else if (outcome.amount() < 0) {
             bad_balance++;
@@ -77,6 +79,7 @@ void run_transfers(const char* isolation,
                 amount = balance;
             }
             // Do the transfer
+            // printf("transfer");
             outcome = transfer(connection, source_id, target_id, amount);
             if (outcome.status() != OK) {
                 failed_transfer++;
