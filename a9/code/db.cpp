@@ -35,7 +35,9 @@ int commit_transaction(PGconn* connection)
 {
     char sql[100];
     sprintf(sql, "commit"); 
-    PGresult* result = PQexecParams(connection, sql, 0, NULL, NULL, NULL, NULL, 0);
+//    PGresult* result = PQexecParams(connection, sql, 0, NULL, NULL, NULL, NULL, 0);
+    PGresult* result = PQexec(conn, "COMMIT");
+    printf("%s\n", PQgetvalue(result, 0, 0))
     if (PQresultStatus(result) == PGRES_COMMAND_OK) 
     {
         return 1;

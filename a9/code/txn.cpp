@@ -85,6 +85,7 @@ BankOpOutcome audit(PGconn* connection)
         "select sum(balance) from account";
 
     PGresult * res = query(connection, AUDIT_BALANCE, 0, NULL);
+    
     //printf("res: %s", PQgetvalue(res, 0, 0));
     return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
 }
