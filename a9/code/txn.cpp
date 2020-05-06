@@ -56,13 +56,16 @@ static int update_balance(PGconn* connection, int account_id, int amount)
 
 BankOpOutcome read_balance(PGconn* connection, int account_id)
 {
-    
     char sql[256];
     
     sprintf(sql, "select balance from account where account_id = %d", account_id);
     
     PGresult * res = query(connection, sql, 0, NULL);
-    return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
+    ExecStatusType status = PQresultStatus(res);
+    if (status == PGRES_TUPLES_OK) {
+        return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
+    }
+    return BankOpOutcome(BALANCE_FAILED);
 }
 
 BankOpOutcome transfer(PGconn* connection, int from_id, int to_id, int amount)
@@ -85,7 +88,9 @@ BankOpOutcome audit(PGconn* connection)
         "select sum(balance) from account";
 
     PGresult * res = query(connection, AUDIT_BALANCE, 0, NULL);
-    
-    //printf("res: %s", PQgetvalue(res, 0, 0));
-    return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
+    ExecStatusType status = PQresultStatus(res);
+    if (status == PGRES_TUPLES_OK){
+        return BankOpOutcome(atoi(PQgetvalue(res, 0, 0)));
+    }
+    return BankOpOutcome(TRANSFER_FAILED);
 }

@@ -3,11 +3,25 @@ balances and bad audits, but nothing else goes wrong. Explain this by
 demonstrating the interleaving of the steps of two processes that can
 produce a) a bad balance, and b) a bad audit.
 
+Answer: In a DEFAULT isolation mode, nothing would goes wrong since there is no isolation restrictions, but this will lead to a negative balance in reading and auditing, for example:
+T1:Begin  R(A), W(A), Commit
+T2:Begin           R(A), W(A), Commit
+In T2, when its read A first, the result is already been written by T1, so if W(A) is doing an update on transfering money from account A, then the read_balance function will return a negative result on R(A) in T2. This process is irrelevant to commit or not. The same result will also occur when doing the auditing process(this maybe a longer process with all the transactions transfering to other account probably, which leads to the sum of all account negative)
+
 2) With READ COMMITTED isolation, there are bad balances, but nothing
 else goes wrong. Explain this, again by showing an interleaving of the
 steps of two processes.
+Answer: In a READ COMMITTED isolation mode, there will only occur bad balances but no bad audit this time. For example:
+T1:Begin R(A) W(A)      Commit(Or rollback)
+T2:Begin           R(A)						R(A) Commit
+In this situation, the value of R(A) are different, this is based on read committed isolation, the first R(A) is the same as the original value in T2, since the first time of R(A), there is no commit operation submit. But in the second R(A), the result is different with first R(A) because this time T1 has committed. In our problem, there will not occur any bad balance is based on the read commited isolation, once there is no other data modified, then there won't occur any bad balance. But the bad audit will occur because this operation is done after all the transactions are done, and in this situation, there will surely occur the bad transaction situation.
+
 
 3) With SERIALIZABLE isolation, the only problem is failed
 transfers. (You could conceivably see a failed commit too.) Explain a
 failed transfer by showing an interleaving of the steps of two
 processes that produces this result.
+Answer: In a SERIALIZABLE isolation, the only problem is the failed transfers. From my point of view, this is not a problem in real life actually. Let's list an example first:
+T1:Begin R(A) W(A)      Commit(Or rollback)
+T2:Begin           R(A)						R(A) Commit
+Like what we have done in previous problem, this time the output of R(A) in T2 are equal. The cause is serializable isolation, whenever doing any read process, we will also gain the value in its own process untill finishing committing. So the leading cause to get so many failed transfers is that once the current account is not able to transfer the amount larger than the balance, this will lead to a failed transfer, which means if account A transfer 10 dollars to B and B transfer 10 dollars to A while their balance are both 5 dollars, this will lead to a failed transfer. Although sometimes the transfer are reasonable at end, but from a security point, this can help prevent most of the money leaking problem. With more failed transfer can give more level of account safety.
